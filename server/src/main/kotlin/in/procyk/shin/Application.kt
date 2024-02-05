@@ -76,7 +76,7 @@ private fun Application.routes(): Routing = routing {
     val redirectBaseUrl = dotenv.env<String>("REDIRECT_BASE_URL")
     post<Shorten> {
         val shortId = findShortenedId(it.url)
-        if (shortId != null) call.respond(HttpStatusCode.OK, URLBuilder(redirectBaseUrl).apply { path(shortId) }.buildString())
+        if (shortId != null) call.respond(HttpStatusCode.OK, "$redirectBaseUrl$shortId")
         else call.respond(HttpStatusCode.InternalServerError)
     }
     get<Decode> {
