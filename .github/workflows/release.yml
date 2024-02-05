@@ -49,3 +49,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./composeApp/build/dist/wasmJs/productionExecutable
           force_orphan: true
+          cname: sh.procyk.in
