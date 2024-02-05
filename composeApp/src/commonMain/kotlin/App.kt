@@ -27,9 +27,9 @@ fun App() {
     val client = HttpClient {
         install(Resources)
         defaultRequest {
-            host = "0.0.0.0"
-            port = 8080
-            url { protocol = URLProtocol.HTTP }
+            host = "api-shorten-kotlin.koyeb.app"
+            port = 443
+            url { protocol = URLProtocol.HTTPS }
         }
     }
     MaterialTheme {
