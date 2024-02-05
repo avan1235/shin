@@ -38,7 +38,6 @@ fun main() {
         password = dotenv.env("POSTGRES_PASSWORD"),
     )
     transaction {
-        SchemaUtils.drop(ShortUrls)
         SchemaUtils.createMissingTablesAndColumns(ShortUrls)
     }
     val appModule = module {
@@ -60,7 +59,7 @@ fun main() {
 }
 
 private val Dotenv.databaseUrl: String
-    get() = "jdbc:pgsql://${env<String>("POSTGRES_HOST")}:${env<String>("POSTGRES_PORT")}/${env<String>("POSTGRES_DB")}"
+    get() = "jdbc:postgresql://${env<String>("POSTGRES_HOST")}:${env<String>("POSTGRES_PORT")}/${env<String>("POSTGRES_DB")}"
 
 private fun Application.installCors(dotenv: Dotenv) {
     val corsPort = dotenv.env<String>("CORS_PORT")
@@ -107,7 +106,7 @@ private suspend fun findShortenedId(url: String): String? {
 }
 
 private object ShortUrls : IdTable<String>() {
-    override val id = varchar("id", 44).uniqueIndex().entityId()
+    override val id = varchar("id", 44).entityId()
     override val primaryKey = PrimaryKey(id)
 
     val url = text("url")

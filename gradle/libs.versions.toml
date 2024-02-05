@@ -19,7 +19,7 @@ ktor-server = "2.3.8"
 ktor-client = "3.0.0-wasm2"
 koin = "3.6.0-wasm-alpha2"
 logback = "1.4.14"
-pgjdbc = "0.8.9"
+postgres = "42.7.1"
 dotenv = "6.4.1"
 dotenvGradle = "4.0.0"
 
@@ -52,7 +52,7 @@ ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "kto
 ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor-client" }
 ktor-client-resources = { module = "io.ktor:ktor-client-resources", version.ref = "ktor-client" }
 koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin" }
-pgjdbc-ng = { module = "com.impossibl.pgjdbc-ng:pgjdbc-ng", version.ref = "pgjdbc" }
+postgres = { module = "org.postgresql:postgresql", version.ref = "postgres" }
 dotenv = { module = "io.github.cdimascio:dotenv-kotlin", version.ref = "dotenv" }
 
 [plugins]

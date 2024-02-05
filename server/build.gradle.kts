@@ -25,7 +25,7 @@ dependencies {
     implementation(libs.exposed.core)
     implementation(libs.exposed.dao)
     implementation(libs.exposed.jdbc)
-    implementation(libs.pgjdbc.ng)
+    implementation(libs.postgres)
     implementation(libs.dotenv)
 
     testImplementation(libs.ktor.server.tests)
