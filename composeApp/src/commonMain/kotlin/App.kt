@@ -80,7 +80,7 @@ fun App() {
                                     end = uri.length,
                                 )
                                 addStringAnnotation(
-                                    tag = "URL",
+                                    tag = URL_TAG,
                                     annotation = uri,
                                     start = 0,
                                     end = uri.length
@@ -92,9 +92,9 @@ fun App() {
                             modifier = Modifier.fillMaxWidth(),
                             onClick = { position ->
                                 annotatedString
-                                    .getStringAnnotations("URL", position, position)
+                                    .getStringAnnotations(URL_TAG, position, position)
                                     .single()
-                                    .let { uriHandler.openUri(it.item) }
+                                    .let { uriHandler.openUri(it.item.normalizeAsHttpUrl()) }
                             }
                         )
                     }
@@ -225,5 +225,9 @@ private enum class ShortenedProtocol(val presentableName: String) {
     HTTP("http"),
     ;
 }
+
+private fun String.normalizeAsHttpUrl() = applyIf(!contains("://")) { "http://$this" }
+
+private const val URL_TAG: String = "SHORT_URL_TAG"
 
 private inline fun <T : Any> T.applyIf(condition: Boolean, action: T.() -> T): T = if (condition) action(this) else this
