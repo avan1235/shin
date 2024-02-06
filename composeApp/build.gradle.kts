@@ -124,7 +124,7 @@ compose {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "in.procyk.shin"
+            packageName = "shin"
             packageVersion = "1.0.0"
         }
     }
