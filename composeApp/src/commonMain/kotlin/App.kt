@@ -114,6 +114,7 @@ private fun ShortenRequest(
     space: Dp = 8.dp,
 ) {
     BoxWithConstraints {
+        val maxWidth = maxWidth
         if (maxHeight > maxWidth) {
             Column(
                 modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -123,7 +124,7 @@ private fun ShortenRequest(
                 ),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                ShortenRequestElements(client, onResponse, fillMaxWidth = true)
+                ShortenRequestElements(client, onResponse, fillMaxWidth = true, maxTextFieldWidth = maxWidth / 2)
             }
         } else {
             Row(
@@ -134,49 +135,28 @@ private fun ShortenRequest(
                 ),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                ShortenRequestElements(client, onResponse, fillMaxWidth = false)
+                ShortenRequestElements(client, onResponse, fillMaxWidth = false, maxTextFieldWidth = maxWidth / 2)
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun ShortenRequestElements(
     client: HttpClient,
     onResponse: (String) -> Unit,
     fillMaxWidth: Boolean,
+    maxTextFieldWidth: Dp,
 ) {
     var url by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
-    var expanded by remember { mutableStateOf(false) }
     var shortenedProtocol by remember { mutableStateOf(ShortenedProtocol.entries.first()) }
 
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = it },
-    ) {
-        OutlinedTextField(
-            value = shortenedProtocol.presentableName,
-            onValueChange = {},
-            readOnly = true,
-            modifier = Modifier.height(50.dp).applyIf(fillMaxWidth) { fillMaxWidth() }.width(128.dp),
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-        )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            ShortenedProtocol.entries.forEach { protocol ->
-                DropdownMenuItem(
-                    content = { Text(protocol.presentableName) },
-                    onClick = {
-                        shortenedProtocol = protocol
-                        expanded = false
-                    })
-            }
-        }
-    }
+    ProtocolChooser(
+        protocol = shortenedProtocol,
+        onChange = { shortenedProtocol = it },
+        fillMaxWidth = fillMaxWidth
+    )
     val focusRequester = remember { FocusRequester() }
     OutlinedTextField(
         value = url,
@@ -184,7 +164,8 @@ private fun ShortenRequestElements(
         modifier = Modifier
             .focusRequester(focusRequester)
             .height(50.dp)
-            .applyIf(fillMaxWidth) { fillMaxWidth() },
+            .applyIf(fillMaxWidth) { fillMaxWidth() }
+            .applyIf(!fillMaxWidth) { widthIn(max = maxTextFieldWidth) },
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(
             onDone = {
@@ -213,6 +194,41 @@ private fun ShortenRequestElements(
     }
     LaunchedEffect(focusRequester) {
         focusRequester.requestFocus()
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun ProtocolChooser(
+    protocol: ShortenedProtocol,
+    onChange: (ShortenedProtocol) -> Unit,
+    fillMaxWidth: Boolean,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it },
+    ) {
+        OutlinedTextField(
+            value = protocol.presentableName,
+            onValueChange = {},
+            readOnly = true,
+            modifier = Modifier.height(50.dp).applyIf(fillMaxWidth) { fillMaxWidth() }.width(128.dp),
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            ShortenedProtocol.entries.forEach { protocol ->
+                DropdownMenuItem(
+                    content = { Text(protocol.presentableName) },
+                    onClick = {
+                        onChange(protocol)
+                        expanded = false
+                    })
+            }
+        }
     }
 }
 
