@@ -3,14 +3,20 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.key.*
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -33,11 +39,18 @@ fun App() {
         }
     }
     MaterialTheme {
+        var response by remember<MutableState<String?>> { mutableStateOf(null) }
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .onKeyEvent { event ->
+                    if (event.run { key == Key.Escape && type == KeyEventType.KeyDown }) {
+                        response = null
+                        true
+                    } else false
+                },
             verticalArrangement = Arrangement.Center,
         ) {
-            var response by remember<MutableState<String?>> { mutableStateOf(null) }
             ShortenRequest(client, onResponse = { response = it })
 
             AnimatedVisibility(
@@ -161,10 +174,26 @@ private fun ShortenRequestElements(
             }
         }
     }
+    val focusRequester = remember { FocusRequester() }
     OutlinedTextField(
         value = url,
         onValueChange = { url = it },
-        modifier = Modifier.height(50.dp).applyIf(fillMaxWidth) { fillMaxWidth() },
+        modifier = Modifier
+            .focusRequester(focusRequester)
+            .height(50.dp)
+            .applyIf(fillMaxWidth) { fillMaxWidth() },
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                scope.launch {
+                    client.post<Shorten>(Shorten(normalizeUrl(url, shortenedProtocol)))
+                        .takeIf { it.status == HttpStatusCode.OK }
+                        ?.bodyAsText()
+                        ?.let(onResponse)
+                }
+            }
+        ),
+        singleLine = true,
     )
     Button(
         modifier = Modifier.height(50.dp).applyIf(fillMaxWidth) { fillMaxWidth() },
@@ -178,6 +207,9 @@ private fun ShortenRequestElements(
         }
     ) {
         Text(text = "Shorten")
+    }
+    LaunchedEffect(focusRequester) {
+        focusRequester.requestFocus()
     }
 }
 
