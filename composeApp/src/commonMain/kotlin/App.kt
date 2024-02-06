@@ -12,7 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.*
-import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -61,7 +62,6 @@ fun App() {
                 Column {
                     Spacer(Modifier.height(16.dp))
                     response?.let { uri ->
-                        val uriHandler = LocalUriHandler.current
                         val color = MaterialTheme.colors.primary
                         val annotatedString = remember(uri, color) {
                             buildAnnotatedString {
@@ -87,6 +87,7 @@ fun App() {
                                 )
                             }
                         }
+                        val clipboardManager = LocalClipboardManager.current
                         ClickableText(
                             text = annotatedString,
                             modifier = Modifier.fillMaxWidth(),
@@ -94,7 +95,10 @@ fun App() {
                                 annotatedString
                                     .getStringAnnotations(URL_TAG, position, position)
                                     .single()
-                                    .let { uriHandler.openUri(it.item.normalizeAsHttpUrl()) }
+                                    .let {
+                                        val url = it.item.normalizeAsHttpUrl()
+                                        clipboardManager.setText(AnnotatedString(url))
+                                    }
                             }
                         )
                     }
