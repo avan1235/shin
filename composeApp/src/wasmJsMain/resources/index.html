@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+<script type="text/javascript">
+    if (window.location.hash.length > 0) {
+        window.location.replace(`https://api-shorten-kotlin.koyeb.app/${window.location.hash.substring(1)}`);
+    }
+</script>
 <head>
     <meta charset="UTF-8">
-    <title>Compose App</title>
-    <script type="text/javascript">
-        if (window.location.hash.length > 0) {
-            window.location.replace(`https://api-shorten-kotlin.koyeb.app/${window.location.hash.substring(1)}`);
-        }
-    </script>
-    <script type="application/javascript" src="skiko.js"></script>
-    <script type="application/javascript" src="composeApp.js"></script>
+    <title>Shorten Your URL in Kotlin</title>
 </head>
 <body>
 <canvas id="ComposeTarget"></canvas>
 </body>
+<script type="application/javascript" src="skiko.js"></script>
+<script type="application/javascript" src="composeApp.js"></script>
 </html>
