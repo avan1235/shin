@@ -1,6 +1,9 @@
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
@@ -86,10 +89,14 @@ fun App() {
                             }
                         }
                         val clipboardManager = LocalClipboardManager.current
+                        val interactionSource = remember { MutableInteractionSource() }
+                        val isHovered by interactionSource.collectIsHoveredAsState()
                         ClickableText(
                             text = annotatedString,
-                            modifier = Modifier.fillMaxWidth(),
-                            style = TextStyle(textDecoration = TextDecoration.Underline),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .hoverable(interactionSource),
+                            style = if (isHovered) TextStyle(textDecoration = TextDecoration.Underline) else TextStyle.Default,
                             onClick = { position ->
                                 annotatedString
                                     .getStringAnnotations(URL_TAG, position, position)
