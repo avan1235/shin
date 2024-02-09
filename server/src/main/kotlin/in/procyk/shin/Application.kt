@@ -24,8 +24,12 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.dsl.module
 import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.Koin
+import java.net.MalformedURLException
+import java.net.URISyntaxException
+import java.net.URL
 import java.security.MessageDigest
 import java.util.*
+
 
 fun main() {
     val dotenv = dotenv {
@@ -77,7 +81,7 @@ private fun Application.routes(): Routing = routing {
     post<Shorten> {
         val shortId = findShortenedId(it.url)
         if (shortId != null) call.respond(HttpStatusCode.OK, "$redirectBaseUrl$shortId")
-        else call.respond(HttpStatusCode.InternalServerError)
+        else call.respond(HttpStatusCode.BadRequest)
     }
     get<Decode> {
         val shortenedId = it.shortenedId
@@ -90,6 +94,8 @@ private fun Application.routes(): Routing = routing {
 }
 
 private suspend fun findShortenedId(url: String): String? {
+    if (!url.isValidURL) return null
+
     val id = url.sha256()
     return newSuspendedTransaction txn@{
         for (n in 1..id.length) {
@@ -131,3 +137,15 @@ private inline fun <reified T : Any> Dotenv.env(name: String): T {
         else -> throw IllegalArgumentException("Unsupported type ${T::class.simpleName}")
     }
 }
+
+private inline val String.isValidURL: Boolean
+    get() {
+        try {
+            URL(this).toURI()
+            return true
+        } catch (e: MalformedURLException) {
+            return false
+        } catch (e: URISyntaxException) {
+            return false
+        }
+    }
