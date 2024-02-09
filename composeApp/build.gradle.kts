@@ -69,6 +69,8 @@ kotlin {
 
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.resources)
+
+            implementation(libs.procyk.compose.qrcode)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

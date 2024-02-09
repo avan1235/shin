@@ -1,6 +1,7 @@
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
@@ -14,8 +15,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
@@ -23,6 +27,9 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import `in`.procyk.compose.qrcode.QrData
+import `in`.procyk.compose.qrcode.options.*
+import `in`.procyk.compose.qrcode.rememberQrCodePainter
 import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.resources.*
@@ -60,9 +67,13 @@ fun App() {
                 enter = expandVertically(expandFrom = Alignment.Top),
                 exit = shrinkVertically(shrinkTowards = Alignment.Top),
             ) {
-                Column {
-                    Spacer(Modifier.height(16.dp))
-                    response?.let { uri ->
+                response?.let {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp, alignment = Alignment.CenterVertically)
+                    ) {
+                        val uri by remember(it) { mutableStateOf(it.normalizeAsHttpUrl()) }
+                        Spacer(Modifier.height(16.dp))
                         val color = MaterialTheme.colors.primary
                         val annotatedString = remember(uri, color) {
                             buildAnnotatedString {
@@ -89,6 +100,7 @@ fun App() {
                             }
                         }
                         val clipboardManager = LocalClipboardManager.current
+                        val localUriHandler = LocalUriHandler.current
                         val interactionSource = remember { MutableInteractionSource() }
                         val isHovered by interactionSource.collectIsHoveredAsState()
                         ClickableText(
@@ -102,11 +114,18 @@ fun App() {
                                     .getStringAnnotations(URL_TAG, position, position)
                                     .single()
                                     .let {
-                                        val url = it.item.normalizeAsHttpUrl()
-                                        clipboardManager.setText(AnnotatedString(url))
+                                        clipboardManager.setText(AnnotatedString(uri))
+                                        localUriHandler.openUri(uri)
                                     }
                             }
                         )
+                        Spacer(Modifier.height(16.dp))
+                        QrCode(uri)
+                        Button(
+                            onClick = { clipboardManager.setText(AnnotatedString(uri)) },
+                        ) {
+                            Text("Copy to Clipboard")
+                        }
                     }
                 }
             }
@@ -146,6 +165,31 @@ private fun ShortenRequest(
             }
         }
     }
+}
+
+@Composable
+private fun QrCode(url: String) {
+    val primaryColor = MaterialTheme.colors.primary
+    val secondaryColor = MaterialTheme.colors.secondary
+    val painter = rememberQrCodePainter(
+        data = QrData.text(url),
+    ) {
+        shapes {
+            ball = QrBallShape.circle()
+            darkPixel = QrPixelShape.roundCorners()
+            frame = QrFrameShape.roundCorners(.25f)
+        }
+        colors {
+            dark = QrBrush.brush {
+                Brush.linearGradient(
+                    0f to secondaryColor,
+                    1f to primaryColor,
+                    end = Offset(it, it)
+                )
+            }
+        }
+    }
+    Image(painter, "QR code")
 }
 
 @Composable
