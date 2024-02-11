@@ -5,8 +5,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.*
-import `in`.procyk.shin.ShortenRequest
-import `in`.procyk.shin.ShortenResponse
+import `in`.procyk.shin.ui.ShortenRequest
+import `in`.procyk.shin.ui.ShortenResponse
 import `in`.procyk.shin.createHttpClient
 
 @Composable

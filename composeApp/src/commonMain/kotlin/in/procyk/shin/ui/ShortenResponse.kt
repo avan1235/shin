@@ -1,4 +1,4 @@
-package `in`.procyk.shin
+package `in`.procyk.shin.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically

@@ -1,4 +1,4 @@
-package `in`.procyk.shin
+package `in`.procyk.shin.ui
 
 import Shorten
 import androidx.compose.foundation.layout.*
@@ -14,6 +14,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import applyIf
+import `in`.procyk.shin.model.ShortenedProtocol
 import io.ktor.client.*
 import io.ktor.client.plugins.resources.*
 import io.ktor.client.statement.*

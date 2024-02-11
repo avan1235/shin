@@ -19,7 +19,6 @@ kotlin {
                 outputFileName = "composeApp.js"
                 val corsPort = env.CORS_PORT.value.toInt()
                 devServer = devServer?.copy(port = corsPort) ?: KotlinWebpackConfig.DevServer(port = corsPort)
-
             }
         }
         binaries.executable()
