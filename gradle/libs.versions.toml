@@ -25,6 +25,7 @@ dotenv = "6.4.1"
 decompose = "3.0.0-alpha06"
 essenty = "2.0.0-alpha06"
 dotenvGradle = "4.0.0"
+buildKonfig = "0.15.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -71,3 +72,4 @@ kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", versio
 ktor = { id = "io.ktor.plugin", version.ref = "ktor-server" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 dotenvGradle = { id = "co.uzzu.dotenv.gradle", version.ref = "dotenvGradle" }
+buildKonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildKonfig" }

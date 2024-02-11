@@ -1,3 +1,5 @@
+import com.codingfeline.buildkonfig.compiler.FieldSpec
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type
 import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
@@ -10,6 +12,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.buildKonfig)
 }
 
 kotlin {
@@ -138,4 +141,14 @@ compose {
         }
     }
     experimental.web.application {}
+}
+
+buildkonfig {
+    packageName = "in.procyk.shin"
+    objectName = "ComposeAppConfig"
+
+    defaultConfigs {
+        buildConfigField(Type.STRING, "CLIENT_HOST", env.CLIENT_HOST.value)
+        buildConfigField(Type.STRING, "CLIENT_PROTOCOL", env.CLIENT_PROTOCOL.value)
+    }
 }

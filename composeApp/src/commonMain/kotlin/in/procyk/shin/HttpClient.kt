@@ -8,8 +8,9 @@ import io.ktor.http.*
 internal fun createHttpClient(): HttpClient = HttpClient {
     install(Resources)
     defaultRequest {
-        host = "api-shorten-kotlin.koyeb.app"
-        port = 443
-        url { protocol = URLProtocol.HTTPS }
+        host = ComposeAppConfig.CLIENT_HOST
+        url {
+            protocol = URLProtocol.byName[ComposeAppConfig.CLIENT_PROTOCOL]!!
+        }
     }
 }
