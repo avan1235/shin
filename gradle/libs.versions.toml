@@ -22,6 +22,8 @@ procyk-compose = "1.6.0-alpha01.1"
 logback = "1.4.14"
 postgres = "42.7.1"
 dotenv = "6.4.1"
+decompose = "3.0.0-alpha06"
+essenty = "2.0.0-alpha06"
 dotenvGradle = "4.0.0"
 
 [libraries]
@@ -56,6 +58,9 @@ koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin" }
 procyk-compose-qrcode = { module = "in.procyk.compose:qr-code", version.ref = "procyk-compose" }
 postgres = { module = "org.postgresql:postgresql", version.ref = "postgres" }
 dotenv = { module = "io.github.cdimascio:dotenv-kotlin", version.ref = "dotenv" }
+decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
+decompose-extensionsComposeJetbrains = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "decompose" }
+essenty = { module = "com.arkivanov.essenty:lifecycle", version.ref = "essenty" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

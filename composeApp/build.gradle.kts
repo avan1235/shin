@@ -1,7 +1,9 @@
 import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
+import org.jetbrains.kotlin.konan.target.Family
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.getCurrentOperatingSystem as currentOS
 
 plugins {
@@ -42,14 +44,17 @@ kotlin {
             iosSimulatorArm64()
         ).forEach { iosTarget ->
             iosTarget.binaries.framework {
+                export(libs.decompose)
+                export(libs.essenty)
+
                 baseName = "ComposeApp"
                 isStatic = true
             }
         }
     }
-
     sourceSets {
         val desktopMain by getting
+        val wasmJsMain by getting
 
         androidMain.dependencies {
             implementation(libs.compose.ui.tooling.preview)
@@ -70,6 +75,9 @@ kotlin {
             implementation(libs.ktor.client.resources)
 
             implementation(libs.procyk.compose.qrcode)
+
+            implementation(libs.decompose)
+            implementation(libs.decompose.extensionsComposeJetbrains)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -79,7 +87,7 @@ kotlin {
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
         }
-        getByName("wasmJsMain").dependencies {
+        wasmJsMain.dependencies {
             implementation(libs.ktor.client.js)
         }
     }
