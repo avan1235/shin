@@ -88,6 +88,9 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
         }
         iosMain.dependencies {
+            api(libs.decompose)
+            api(libs.essenty)
+
             implementation(libs.ktor.client.darwin)
         }
         wasmJsMain.dependencies {
