@@ -29,6 +29,7 @@ import kotlinx.coroutines.launch
 internal fun ShortenRequest(
     client: HttpClient,
     onResponse: (String) -> Unit,
+    onError: (String) -> Unit,
     space: Dp = 8.dp,
 ) {
     BoxWithConstraints {
@@ -42,7 +43,13 @@ internal fun ShortenRequest(
                 ),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                ShortenRequestElements(client, onResponse, fillMaxWidth = true, maxTextFieldWidth = maxWidth / 2)
+                ShortenRequestElements(
+                    client = client,
+                    onResponse = onResponse,
+                    onError = onError,
+                    fillMaxWidth = true,
+                    maxTextFieldWidth = maxWidth / 2
+                )
             }
         } else {
             Row(
@@ -53,7 +60,13 @@ internal fun ShortenRequest(
                 ),
                 verticalAlignment = Alignment.Bottom,
             ) {
-                ShortenRequestElements(client, onResponse, fillMaxWidth = false, maxTextFieldWidth = maxWidth / 2)
+                ShortenRequestElements(
+                    client = client,
+                    onResponse = onResponse,
+                    onError = onError,
+                    fillMaxWidth = false,
+                    maxTextFieldWidth = maxWidth / 2
+                )
             }
         }
     }
@@ -63,6 +76,7 @@ internal fun ShortenRequest(
 private fun ShortenRequestElements(
     client: HttpClient,
     onResponse: (String) -> Unit,
+    onError: (String) -> Unit,
     fillMaxWidth: Boolean,
     maxTextFieldWidth: Dp,
 ) {
@@ -91,7 +105,7 @@ private fun ShortenRequestElements(
             .applyIf(!fillMaxWidth) { widthIn(max = maxTextFieldWidth) },
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(
-            onDone = { client.askForShortenedUrl(scope, url, shortenedProtocol, onResponse) }
+            onDone = { client.askForShortenedUrl(scope, url, shortenedProtocol, onResponse, onError) }
         ),
         singleLine = true,
         shape = RoundedCornerShape(12.dp),
@@ -101,7 +115,7 @@ private fun ShortenRequestElements(
             .height(56.dp)
             .applyIf(fillMaxWidth) { fillMaxWidth() },
         shape = RoundedCornerShape(12.dp),
-        onClick = { client.askForShortenedUrl(scope, url, shortenedProtocol, onResponse) }
+        onClick = { client.askForShortenedUrl(scope, url, shortenedProtocol, onResponse, onError) }
     ) {
         Text(
             text = "Shorten",
@@ -164,6 +178,7 @@ private fun HttpClient.askForShortenedUrl(
     url: String,
     shortenedProtocol: ShortenedProtocol,
     onResponse: (String) -> Unit,
+    onError: (String) -> Unit,
 ): Job = scope.launch {
     try {
         post<Shorten>(Shorten(shortenedProtocol.buildUrl(url)))
@@ -171,5 +186,6 @@ private fun HttpClient.askForShortenedUrl(
             ?.bodyAsText()
             ?.let(onResponse)
     } catch (_: Exception) {
+        onError("Cannot connect to Shin. Try again later…")
     }
 }
