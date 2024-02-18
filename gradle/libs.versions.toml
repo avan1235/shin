@@ -33,7 +33,8 @@ ktor-server-netty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "k
 ktor-server-tests = { module = "io.ktor:ktor-server-tests-jvm", version.ref = "ktor-server" }
 ktor-server-resources = { module = "io.ktor:ktor-server-resources", version.ref = "ktor-server" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor-client" }
-ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor-client" }
+ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor-client" }
+ktor-client-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor-client" }
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor-client" }
 ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor-client" }
 ktor-client-resources = { module = "io.ktor:ktor-client-resources", version.ref = "ktor-client" }

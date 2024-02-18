@@ -1,0 +1,2 @@
+-keep class io.ktor.client.engine.java.JavaHttpEngineContainer
+-dontwarn org.slf4j.**

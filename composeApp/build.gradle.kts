@@ -62,7 +62,7 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
 
-            implementation(libs.ktor.client.okhttp)
+            implementation(libs.ktor.client.android)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -83,7 +83,7 @@ kotlin {
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
 
-            implementation(libs.ktor.client.okhttp)
+            implementation(libs.ktor.client.java)
         }
         iosMain.dependencies {
             api(libs.decompose)
@@ -136,6 +136,26 @@ compose {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "shin"
             packageVersion = "1.0.0"
+            modules("java.net.http")
+
+            windows {
+                menu = false
+                upgradeUuid = "1a273513-558a-4322-9833-ff3a4c3c1173"
+            }
+
+            macOS {
+                bundleID = "in.procyk.shin"
+                appStore = false
+                signing {
+                    sign.set(false)
+                }
+            }
+        }
+        buildTypes.release.proguard {
+            configurationFiles.from(project.file("compose-desktop.pro"))
+            isEnabled = true
+            optimize = true
+            obfuscate = true
         }
     }
     experimental.web.application {}
