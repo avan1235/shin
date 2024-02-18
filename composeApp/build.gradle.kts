@@ -155,7 +155,7 @@ compose {
             configurationFiles.from(project.file("compose-desktop.pro"))
             isEnabled = true
             optimize = true
-            obfuscate = true
+            obfuscate = false
         }
     }
     experimental.web.application {}
