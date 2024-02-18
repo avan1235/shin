@@ -131,11 +131,11 @@ android {
 compose {
     desktop.application {
         mainClass = "MainKt"
+        version = env.VERSION.value
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "shin"
-            packageVersion = "1.0.0"
             modules("java.net.http")
 
             windows {
