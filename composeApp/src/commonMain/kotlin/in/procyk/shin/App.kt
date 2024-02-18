@@ -1,18 +1,18 @@
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.*
+import `in`.procyk.shin.createHttpClient
 import `in`.procyk.shin.ui.ShortenRequest
 import `in`.procyk.shin.ui.ShortenResponse
-import `in`.procyk.shin.createHttpClient
+import `in`.procyk.shin.ui.theme.ShinTheme
 
 @Composable
 fun ShinApp() {
     val client = remember { createHttpClient() }
-    MaterialTheme {
+    ShinTheme {
         var shortenedUrl by remember<MutableState<String?>> { mutableStateOf(null) }
         Column(
             modifier = Modifier
