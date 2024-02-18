@@ -2,9 +2,10 @@ package `in`.procyk.shin.ui
 
 import Shorten
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -13,6 +14,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import applyIf
 import `in`.procyk.shin.model.ShortenedProtocol
 import io.ktor.client.*
@@ -49,7 +51,7 @@ internal fun ShortenRequest(
                     space = space,
                     alignment = Alignment.CenterHorizontally,
                 ),
-                verticalAlignment = Alignment.CenterVertically,
+                verticalAlignment = Alignment.Bottom,
             ) {
                 ShortenRequestElements(client, onResponse, fillMaxWidth = false, maxTextFieldWidth = maxWidth / 2)
             }
@@ -76,10 +78,15 @@ private fun ShortenRequestElements(
     val focusRequester = remember { FocusRequester() }
     OutlinedTextField(
         value = url,
-        onValueChange = { url = it },
+        onValueChange = { updatedInput ->
+            val (updatedUrl, protocol) = ShortenedProtocol.simplifyInputUrl(updatedInput)
+            url = updatedUrl
+            protocol?.let { shortenedProtocol = it }
+        },
+        label = { Text("URL") },
         modifier = Modifier
             .focusRequester(focusRequester)
-            .height(50.dp)
+            .height(64.dp)
             .applyIf(fillMaxWidth) { fillMaxWidth() }
             .applyIf(!fillMaxWidth) { widthIn(max = maxTextFieldWidth) },
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
@@ -87,19 +94,26 @@ private fun ShortenRequestElements(
             onDone = { client.askForShortenedUrl(scope, url, shortenedProtocol, onResponse) }
         ),
         singleLine = true,
+        shape = RoundedCornerShape(12.dp),
     )
     Button(
-        modifier = Modifier.height(50.dp).applyIf(fillMaxWidth) { fillMaxWidth() },
+        modifier = Modifier
+            .height(56.dp)
+            .applyIf(fillMaxWidth) { fillMaxWidth() },
+        shape = RoundedCornerShape(12.dp),
         onClick = { client.askForShortenedUrl(scope, url, shortenedProtocol, onResponse) }
     ) {
-        Text(text = "Shorten")
+        Text(
+            text = "Shorten",
+            fontSize = 18.sp,
+        )
     }
     LaunchedEffect(focusRequester) {
         focusRequester.requestFocus()
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ProtocolChooser(
     protocol: ShortenedProtocol,
@@ -112,22 +126,30 @@ private fun ProtocolChooser(
         onExpandedChange = { expanded = it },
     ) {
         OutlinedTextField(
+            readOnly = true,
             value = protocol.presentableName,
             onValueChange = {},
-            readOnly = true,
+            label = { Text("Protocol") },
             modifier = Modifier
-                .height(50.dp)
+                .menuAnchor()
+                .height(64.dp)
                 .applyIf(fillMaxWidth) { fillMaxWidth() }
                 .width(128.dp),
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
+            singleLine = true,
+            shape = RoundedCornerShape(12.dp),
         )
         ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
         ) {
             ShortenedProtocol.entries.forEach { protocol ->
                 DropdownMenuItem(
-                    content = { Text(protocol.presentableName) },
+                    text = {
+                        Text(protocol.presentableName)
+                    },
                     onClick = {
                         onChange(protocol)
                         expanded = false
@@ -137,13 +159,6 @@ private fun ProtocolChooser(
     }
 }
 
-private fun normalizeInputUrl(url: String, protocol: ShortenedProtocol): String {
-    val protocolDelimiter = "://"
-    val idx = url.indexOf(protocolDelimiter)
-    val noProtocolUrl = if (idx != -1) url.drop(idx + protocolDelimiter.length) else url
-    return protocol.presentableName + protocolDelimiter + noProtocolUrl
-}
-
 private fun HttpClient.askForShortenedUrl(
     scope: CoroutineScope,
     url: String,
@@ -151,7 +166,7 @@ private fun HttpClient.askForShortenedUrl(
     onResponse: (String) -> Unit,
 ): Job = scope.launch {
     try {
-        post<Shorten>(Shorten(normalizeInputUrl(url, shortenedProtocol)))
+        post<Shorten>(Shorten(shortenedProtocol.buildUrl(url)))
             .takeIf { it.status == HttpStatusCode.OK }
             ?.bodyAsText()
             ?.let(onResponse)

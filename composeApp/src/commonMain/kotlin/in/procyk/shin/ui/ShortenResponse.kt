@@ -8,9 +8,9 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,7 +40,7 @@ internal fun ShortenResponse(shortenedUrl: String?) {
             ) {
                 val uri by remember(it) { mutableStateOf(it.normalizeAsHttpUrl()) }
                 Spacer(Modifier.height(16.dp))
-                val color = MaterialTheme.colors.primary
+                val color = MaterialTheme.colorScheme.primary
                 val annotatedString = remember(uri, color) {
                     buildAnnotatedString {
                         append(uri)
