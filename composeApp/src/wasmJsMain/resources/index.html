@@ -119,4 +119,11 @@
 
 <script type="application/javascript" src="skiko.js"></script>
 <script type="application/javascript" src="composeApp.js"></script>
+<script>
+    window.onload = function () {
+        const canvasElm = document.getElementById("ComposeTarget");
+        canvasElm.setAttribute("tabindex", "0");
+        canvasElm.focus();
+    }
+</script>
 </html>
