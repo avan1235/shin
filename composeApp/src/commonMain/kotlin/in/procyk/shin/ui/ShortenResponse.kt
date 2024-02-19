@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -87,11 +88,12 @@ internal fun ShortenResponse(shortenedUrl: String?) {
                 )
                 Spacer(Modifier.height(16.dp))
                 QrCode(uri)
-                Button(
+                OutlinedButton(
                     onClick = { clipboardManager.setText(AnnotatedString(uri)) },
                 ) {
                     Text("Copy to Clipboard")
                 }
+                Spacer(Modifier.height(8.dp))
             }
         }
     }
