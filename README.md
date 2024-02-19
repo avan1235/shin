@@ -1,27 +1,29 @@
+# Shin
+
+[![Platforms](https://img.shields.io/badge/web-WebAssembly-blue)](https://sh.procyk.in)
+[![Platforms](https://img.shields.io/badge/mobile-Android%20%7C%20iOS-blue)](https://github.com/avan1235/shin/releases/latest)
+[![Platforms](https://img.shields.io/badge/desktop-Windows%20%7C%20macOS%20%7C%20Linux-blue)](https://github.com/avan1235/shin/releases/latest)
+
+[![Build](https://img.shields.io/github/actions/workflow/status/avan1235/shin/release.yml?label=Build&color=green)](https://github.com/avan1235/shin/actions/workflows/release.yml)
+[![Latest Release](https://img.shields.io/github/v/release/avan1235/shin?label=Release&color=green)](https://github.com/avan1235/shin/releases/latest)
+[![Docker](https://img.shields.io/docker/v/avan1235/shin?label=Docker%20Hub&color=green)](https://hub.docker.com/repository/docker/avan1235/shin/tags?ordering=last_updated)
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-red.svg)](./LICENSE.md)
+[![GitHub Repo stars](https://img.shields.io/github/stars/avan1235/shin?style=social)](https://github.com/avan1235/shin/stargazers)
+[![Fork Shin](https://img.shields.io/github/forks/avan1235/shin?logo=github&style=social)](https://github.com/avan1235/shin/fork)
+
+## Introduction
+
 This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop, Server.
 
 * `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
   It contains several subfolders:
   - `commonMain` is for code that’s common for all targets.
   - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    `iosMain` would be the right folder for such calls.
 
-* `/iosApp` contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform, 
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+* `/iosApp` contains iOS applications. Eventhough we’re sharing UI with Compose Multiplatform,
+  it's needed as an entry point for an iOS app.
 
 * `/server` is for the Ktor server application.
 
 * `/shared` is for the code that will be shared between all targets in the project.
-  The most important subfolder is `commonMain`. If preferred, you can add code to the platform-specific folders here too.
-
-
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
-[Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#compose-multiplatform),
-[Kotlin/Wasm](https://kotl.in/wasm/)…
-
-**Note:** Compose/Web is Experimental and may be changed at any time. Use it only for evaluation purposes.
-We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
-If you face any issues, please report them on [GitHub](https://github.com/JetBrains/compose-multiplatform/issues).
-
-You can open the web application by running the `:composeApp:wasmJsBrowserDevelopmentRun` Gradle task.
