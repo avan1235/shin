@@ -19,7 +19,7 @@ internal fun Application.installRoutes(): Routing = routing {
     val redirectBaseUrl = dotenv.env<String>("REDIRECT_BASE_URL")
     post<Shorten> {
         val shortId = service.findOrCreateShortenedId(it.url)
-        if (shortId != null) call.respond(HttpStatusCode.OK, "$redirectBaseUrl$shortId")
+        if (shortId != null) call.respond(HttpStatusCode.OK, "https://$redirectBaseUrl$shortId")
         else call.respond(HttpStatusCode.BadRequest)
     }
     get<Decode> {

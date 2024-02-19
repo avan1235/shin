@@ -8,7 +8,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -28,41 +27,42 @@ import androidx.compose.ui.unit.sp
 import applyIf
 
 @Composable
-internal fun ShortenResponse(shortenedUrl: String?) {
+internal fun ShortenResponse(
+    shortenedUrl: String?,
+) {
     AnimatedVisibility(
         visible = shortenedUrl != null,
         enter = expandVertically(expandFrom = Alignment.Top),
         exit = shrinkVertically(shrinkTowards = Alignment.Top),
     ) {
-        shortenedUrl?.let {
+        shortenedUrl?.let { url ->
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp, alignment = Alignment.CenterVertically)
             ) {
-                val uri by remember(it) { mutableStateOf(it.normalizeAsHttpUrl()) }
                 Spacer(Modifier.height(16.dp))
                 val color = MaterialTheme.colorScheme.primary
-                val annotatedString = remember(uri, color) {
+                val annotatedString = remember(url, color) {
                     buildAnnotatedString {
-                        append(uri)
+                        append(url)
                         addStyle(
                             style = SpanStyle(
                                 color = color,
                                 fontSize = 18.sp,
                             ),
                             start = 0,
-                            end = uri.length,
+                            end = url.length,
                         )
                         addStyle(
                             style = ParagraphStyle(textAlign = TextAlign.Center),
                             start = 0,
-                            end = uri.length,
+                            end = url.length,
                         )
                         addStringAnnotation(
                             tag = URL_TAG,
-                            annotation = uri,
+                            annotation = url,
                             start = 0,
-                            end = uri.length
+                            end = url.length
                         )
                     }
                 }
@@ -81,15 +81,15 @@ internal fun ShortenResponse(shortenedUrl: String?) {
                             .getStringAnnotations(URL_TAG, position, position)
                             .single()
                             .let {
-                                clipboardManager.setText(AnnotatedString(uri))
-                                localUriHandler.openUri(uri)
+                                clipboardManager.setText(AnnotatedString(url))
+                                localUriHandler.openUri(url)
                             }
                     }
                 )
                 Spacer(Modifier.height(16.dp))
-                QrCode(uri)
+                QrCode(url)
                 OutlinedButton(
-                    onClick = { clipboardManager.setText(AnnotatedString(uri)) },
+                    onClick = { clipboardManager.setText(AnnotatedString(url)) },
                 ) {
                     Text("Copy to Clipboard")
                 }
@@ -98,7 +98,5 @@ internal fun ShortenResponse(shortenedUrl: String?) {
         }
     }
 }
-
-private fun String.normalizeAsHttpUrl() = applyIf(!contains("://")) { "http://$this" }
 
 private const val URL_TAG: String = "SHORT_URL_TAG"
