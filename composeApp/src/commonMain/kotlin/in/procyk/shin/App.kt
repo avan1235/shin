@@ -1,4 +1,6 @@
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -30,10 +32,12 @@ fun ShinApp() {
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
         ) {
             var shortenedUrl by remember<MutableState<String?>> { mutableStateOf(null) }
+            val scrollState = rememberScrollState()
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .onKeyEvent { event -> event.isEscDown.also { if (it) shortenedUrl = null } },
+                    .onKeyEvent { event -> event.isEscDown.also { if (it) shortenedUrl = null } }
+                    .verticalScroll(scrollState),
                 verticalArrangement = Arrangement.Center,
             ) {
                 Text(
