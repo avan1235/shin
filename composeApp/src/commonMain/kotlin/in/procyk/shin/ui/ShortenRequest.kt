@@ -29,46 +29,45 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun ShortenRequest(
     client: HttpClient,
+    maxWidth: Dp,
+    isVertical: Boolean,
     onResponse: (String) -> Unit,
     onError: (String) -> Unit,
     space: Dp = 8.dp,
 ) {
-    BoxWithConstraints {
-        val maxWidth = maxWidth
-        if (maxHeight > maxWidth) {
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(
-                    space = space,
-                    alignment = Alignment.CenterVertically,
-                ),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                ShortenRequestElements(
-                    client = client,
-                    onResponse = onResponse,
-                    onError = onError,
-                    fillMaxWidth = true,
-                    maxTextFieldWidth = maxWidth / 2
-                )
-            }
-        } else {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(
-                    space = space,
-                    alignment = Alignment.CenterHorizontally,
-                ),
-                verticalAlignment = Alignment.Bottom,
-            ) {
-                ShortenRequestElements(
-                    client = client,
-                    onResponse = onResponse,
-                    onError = onError,
-                    fillMaxWidth = false,
-                    maxTextFieldWidth = maxWidth / 2
-                )
-            }
+    if (isVertical) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(
+                space = space,
+                alignment = Alignment.CenterVertically,
+            ),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            ShortenRequestElements(
+                client = client,
+                onResponse = onResponse,
+                onError = onError,
+                fillMaxWidth = true,
+                maxTextFieldWidth = maxWidth / 2
+            )
+        }
+    } else {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(
+                space = space,
+                alignment = Alignment.CenterHorizontally,
+            ),
+            verticalAlignment = Alignment.Bottom,
+        ) {
+            ShortenRequestElements(
+                client = client,
+                onResponse = onResponse,
+                onError = onError,
+                fillMaxWidth = false,
+                maxTextFieldWidth = maxWidth / 2
+            )
         }
     }
 }
