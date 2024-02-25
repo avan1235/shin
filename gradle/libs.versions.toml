@@ -1,5 +1,5 @@
 [versions]
-agp = "8.1.2"
+agp = "8.2.2"
 android-compileSdk = "34"
 android-minSdk = "26"
 android-targetSdk = "34"
@@ -14,8 +14,8 @@ procyk-compose = "1.6.0-rc02.0"
 logback = "1.4.14"
 postgres = "42.7.1"
 dotenv = "6.4.1"
-decompose = "3.0.0-alpha06"
-essenty = "2.0.0-alpha06"
+decompose = "3.0.0-alpha07"
+essenty = "2.0.0-alpha07"
 dotenvGradle = "4.0.0"
 buildKonfig = "0.15.1"
 
