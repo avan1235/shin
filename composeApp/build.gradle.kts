@@ -24,6 +24,7 @@ kotlin {
             }
         }
         binaries.executable()
+        applyBinaryen()
     }
 
     androidTarget {
