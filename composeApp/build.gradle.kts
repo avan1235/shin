@@ -2,7 +2,6 @@ import com.codingfeline.buildkonfig.compiler.FieldSpec.Type
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
-import org.jetbrains.kotlin.gradle.tasks.IncrementalSyncTask
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.getCurrentOperatingSystem as currentOS
 
 plugins {
@@ -167,8 +166,4 @@ buildkonfig {
         buildConfigField(Type.STRING, "CLIENT_HOST", env.CLIENT_HOST.value)
         buildConfigField(Type.STRING, "CLIENT_PROTOCOL", env.CLIENT_PROTOCOL.value)
     }
-}
-
-tasks.withType<IncrementalSyncTask>() {
-    from.from(layout.buildDirectory.dir("compose/skiko-wasm/wasmJs"))
 }
