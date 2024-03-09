@@ -59,6 +59,7 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
 
+            implementation(libs.kotlinx.coroutines.android)
             implementation(libs.ktor.client.android)
         }
         commonMain.dependencies {
@@ -76,10 +77,13 @@ kotlin {
 
             implementation(libs.decompose)
             implementation(libs.decompose.extensionsComposeJetbrains)
+
+            implementation(libs.kotlinx.datetime)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
 
+            implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.ktor.client.java)
         }
         iosMain.dependencies {

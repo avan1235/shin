@@ -1,6 +1,5 @@
 package `in`.procyk.shin.ui
 
-import Shorten
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -17,22 +16,20 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import applyIf
+import com.arkivanov.decompose.extensions.compose.subscribeAsState
+import `in`.procyk.shin.component.ShinComponent
 import `in`.procyk.shin.model.ShortenedProtocol
 import io.ktor.client.*
 import io.ktor.client.plugins.resources.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
 
 @Composable
 internal fun ShortenRequest(
-    client: HttpClient,
+    component: ShinComponent,
     maxWidth: Dp,
     isVertical: Boolean,
-    onResponse: (String) -> Unit,
-    onError: (String) -> Unit,
     space: Dp = 8.dp,
 ) {
     if (isVertical) {
@@ -45,9 +42,7 @@ internal fun ShortenRequest(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             ShortenRequestElements(
-                client = client,
-                onResponse = onResponse,
-                onError = onError,
+                component = component,
                 fillMaxWidth = true,
                 maxTextFieldWidth = maxWidth / 2
             )
@@ -62,42 +57,34 @@ internal fun ShortenRequest(
             verticalAlignment = Alignment.Bottom,
         ) {
             ShortenRequestElements(
-                client = client,
-                onResponse = onResponse,
-                onError = onError,
+                component = component,
                 fillMaxWidth = false,
                 maxTextFieldWidth = maxWidth / 2
             )
         }
     }
+
 }
 
 @Composable
 private fun ShortenRequestElements(
-    client: HttpClient,
-    onResponse: (String) -> Unit,
-    onError: (String) -> Unit,
+    component: ShinComponent,
     fillMaxWidth: Boolean,
     maxTextFieldWidth: Dp,
 ) {
-    var url by remember { mutableStateOf("") }
-    val scope = rememberCoroutineScope()
-    var shortenedProtocol by remember { mutableStateOf(ShortenedProtocol.entries.first()) }
+    val url by component.url.subscribeAsState()
+    val protocol by component.protocol.subscribeAsState()
 
     ProtocolChooser(
-        protocol = shortenedProtocol,
-        onChange = { shortenedProtocol = it },
+        protocol = protocol,
+        onChange = component::onProtocolChange,
         fillMaxWidth = fillMaxWidth
     )
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
     OutlinedTextField(
         value = url,
-        onValueChange = { updatedInput ->
-            val (updatedUrl, protocol) = ShortenedProtocol.simplifyInputUrl(updatedInput)
-            url = updatedUrl
-            protocol?.let { shortenedProtocol = it }
-        },
+        onValueChange = component::onUrlChange,
         label = { Text("URL") },
         modifier = Modifier
             .focusRequester(focusRequester)
@@ -107,7 +94,7 @@ private fun ShortenRequestElements(
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(
             onDone = {
-                client.askForShortenedUrl(scope, url, shortenedProtocol, onResponse, onError)
+                component.onShorten()
                 keyboardController?.hide()
             }
         ),
@@ -119,7 +106,7 @@ private fun ShortenRequestElements(
             .height(56.dp)
             .applyIf(fillMaxWidth) { fillMaxWidth() },
         shape = RoundedCornerShape(12.dp),
-        onClick = { client.askForShortenedUrl(scope, url, shortenedProtocol, onResponse, onError) }
+        onClick = component::onShorten,
     ) {
         Text(
             text = "Shorten",
@@ -174,22 +161,5 @@ private fun ProtocolChooser(
                     })
             }
         }
-    }
-}
-
-private fun HttpClient.askForShortenedUrl(
-    scope: CoroutineScope,
-    url: String,
-    shortenedProtocol: ShortenedProtocol,
-    onResponse: (String) -> Unit,
-    onError: (String) -> Unit,
-): Job = scope.launch {
-    try {
-        post<Shorten>(Shorten(shortenedProtocol.buildUrl(url)))
-            .takeIf { it.status == HttpStatusCode.OK }
-            ?.bodyAsText()
-            ?.let(onResponse)
-    } catch (_: Exception) {
-        onError("Cannot connect to Shin. Try again later…")
     }
 }
