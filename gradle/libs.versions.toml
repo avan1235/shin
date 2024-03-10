@@ -12,6 +12,7 @@ ktor-client = "3.0.0-wasm2"
 koin = "3.6.0-wasm-alpha2"
 kotlinxDatetime = "0.6.0-RC.2"
 kotlinxCoroutines = "1.8.0"
+kotlinxSerialization = "1.6.3"
 procyk-compose = "1.6.0-rc02.0"
 logback = "1.4.14"
 postgres = "42.7.1"
@@ -44,12 +45,15 @@ koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinxCoroutines" }
+kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinxSerialization" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 procyk-compose-qrcode = { module = "in.procyk.compose:qr-code", version.ref = "procyk-compose" }
 postgres = { module = "org.postgresql:postgresql", version.ref = "postgres" }
 dotenv = { module = "io.github.cdimascio:dotenv-kotlin", version.ref = "dotenv" }
 decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
 decompose-extensionsComposeJetbrains = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "decompose" }
-essenty = { module = "com.arkivanov.essenty:lifecycle", version.ref = "essenty" }
+essenty-lifecycle = { module = "com.arkivanov.essenty:lifecycle", version.ref = "essenty" }
+essenty-statekeeper = { module = "com.arkivanov.essenty:state-keeper", version.ref = "essenty" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

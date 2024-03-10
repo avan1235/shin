@@ -19,11 +19,6 @@ import applyIf
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import `in`.procyk.shin.component.ShinComponent
 import `in`.procyk.shin.model.ShortenedProtocol
-import io.ktor.client.*
-import io.ktor.client.plugins.resources.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import kotlinx.datetime.Instant
 
 @Composable
 internal fun ShortenRequest(

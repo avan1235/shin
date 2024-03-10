@@ -45,7 +45,8 @@ kotlin {
         ).forEach { iosTarget ->
             iosTarget.binaries.framework {
                 export(libs.decompose)
-                export(libs.essenty)
+                export(libs.essenty.lifecycle)
+                export(libs.essenty.statekeeper)
 
                 baseName = "ComposeApp"
                 isStatic = true
@@ -79,6 +80,8 @@ kotlin {
             implementation(libs.decompose.extensionsComposeJetbrains)
 
             implementation(libs.kotlinx.datetime)
+            implementation(libs.kotlinx.serialization.core)
+            implementation(libs.kotlinx.serialization.json)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -88,7 +91,8 @@ kotlin {
         }
         iosMain.dependencies {
             api(libs.decompose)
-            api(libs.essenty)
+            api(libs.essenty.lifecycle)
+            api(libs.essenty.statekeeper)
 
             implementation(libs.ktor.client.darwin)
         }

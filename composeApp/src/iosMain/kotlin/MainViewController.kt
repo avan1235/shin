@@ -1,3 +1,6 @@
 import androidx.compose.ui.window.ComposeUIViewController
+import `in`.procyk.shin.component.ShinComponent
 
-fun MainViewController() = ComposeUIViewController { ShinApp() }
+fun MainViewController(component: ShinComponent) = ComposeUIViewController {
+    ShinApp(component)
+}
