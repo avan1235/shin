@@ -75,6 +75,7 @@ kotlin {
             implementation(libs.ktor.client.resources)
 
             implementation(libs.procyk.compose.qrcode)
+            implementation(libs.procyk.compose.calendar)
 
             implementation(libs.decompose)
             implementation(libs.decompose.extensionsComposeJetbrains)

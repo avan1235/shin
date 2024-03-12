@@ -1,6 +1,13 @@
 package `in`.procyk.shin.service
 
 import `in`.procyk.shin.db.ShortUrl
+import `in`.procyk.shin.db.ShortUrls
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.isNotNull
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.lessEq
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.koin.core.module.Module
 import java.net.URI
@@ -9,17 +16,19 @@ import java.security.MessageDigest
 import java.util.*
 
 internal interface ShortUrlService {
-    suspend fun findOrCreateShortenedId(rawUrl: String): String?
+    suspend fun findOrCreateShortenedId(rawUrl: String, expirationAt: Instant?): String?
 
     suspend fun findShortenedUrl(shortenedId: String): String?
+
+    suspend fun deleteExpiredUrls()
 }
 
 internal fun Module.singleShortUrlService() {
-    single<ShortUrlService> { ShortUrlServiceImpl }
+    single<ShortUrlService> { ShortUrlServiceImpl() }
 }
 
-private object ShortUrlServiceImpl : ShortUrlService {
-    override suspend fun findOrCreateShortenedId(rawUrl: String): String? {
+private class ShortUrlServiceImpl : ShortUrlService {
+    override suspend fun findOrCreateShortenedId(rawUrl: String, expirationAt: Instant?): String? {
         val url = rawUrl.normalizeAsUrl() ?: return null
 
         val id = url.sha256()
@@ -28,8 +37,25 @@ private object ShortUrlServiceImpl : ShortUrlService {
                 val shortId = id.take(n)
                 val existing = ShortUrl.findById(shortId)
                 when (existing?.url) {
-                    null -> ShortUrl.new(shortId) { this.url = url }.let { return@txn shortId }
-                    url -> return@txn shortId
+                    null -> ShortUrl.new(shortId) {
+                        this.url = url
+                        this.expirationAt = expirationAt
+                    }.let { return@txn shortId }
+
+                    url -> {
+                        val prevExpirationAt = existing.expirationAt
+                        when {
+                            prevExpirationAt == null -> return@txn shortId
+
+                            expirationAt == null || expirationAt > prevExpirationAt -> {
+                                existing.expirationAt = expirationAt
+                                return@txn shortId
+                            }
+
+                            else -> return@txn shortId
+                        }
+                    }
+
                     else -> continue
                 }
             }
@@ -39,6 +65,13 @@ private object ShortUrlServiceImpl : ShortUrlService {
 
     override suspend fun findShortenedUrl(shortenedId: String): String? = newSuspendedTransaction {
         ShortUrl.findById(shortenedId)?.url
+    }
+
+    override suspend fun deleteExpiredUrls() {
+        val now = Clock.System.now()
+        newSuspendedTransaction {
+            ShortUrls.deleteWhere { (expirationAt.isNotNull()) and (expirationAt.lessEq(now)) }
+        }
     }
 }
 

@@ -1,13 +1,18 @@
 package `in`.procyk.shin.ui
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -17,6 +22,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import applyIf
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
+import `in`.procyk.compose.calendar.SelectableCalendar
+import `in`.procyk.compose.calendar.rememberSelectableCalendarState
+import `in`.procyk.compose.calendar.year.YearMonth
 import `in`.procyk.shin.component.ShinComponent
 import `in`.procyk.shin.model.ShortenedProtocol
 
@@ -27,38 +35,78 @@ internal fun ShortenRequest(
     isVertical: Boolean,
     space: Dp = 8.dp,
 ) {
-    if (isVertical) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(
-                space = space,
-                alignment = Alignment.CenterVertically,
-            ),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            ShortenRequestElements(
-                component = component,
-                fillMaxWidth = true,
-                maxTextFieldWidth = maxWidth / 2
-            )
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        when {
+            isVertical -> Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(
+                    space = space,
+                    alignment = Alignment.CenterVertically,
+                ),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                ShortenRequestElements(
+                    component = component,
+                    fillMaxWidth = true,
+                    maxTextFieldWidth = maxWidth / 2
+                )
+            }
+
+            else -> Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(
+                    space = space,
+                    alignment = Alignment.CenterHorizontally,
+                ),
+                verticalAlignment = Alignment.Bottom,
+            ) {
+                ShortenRequestElements(
+                    component = component,
+                    fillMaxWidth = false,
+                    maxTextFieldWidth = maxWidth / 2
+                )
+            }
         }
-    } else {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(
-                space = space,
-                alignment = Alignment.CenterHorizontally,
-            ),
-            verticalAlignment = Alignment.Bottom,
+        Spacer(Modifier.height(12.dp))
+        ShortenRequestExtraElements(component)
+    }
+}
+
+@Composable
+private fun ShortenRequestExtraElements(
+    component: ShinComponent,
+) {
+    val extraElementsVisible by component.extraElementsVisible.subscribeAsState()
+    val expirationDate by component.expirationDate.subscribeAsState()
+    val rotation by animateFloatAsState(if (extraElementsVisible) 180f else 0f)
+    OutlinedButton(onClick = component::onExtraElementsVisibleChange) {
+        Text("Extra Options")
+        Icon(
+            imageVector = Icons.Filled.ArrowDropDown,
+            modifier = Modifier.rotate(rotation),
+            contentDescription = "Extra Options"
+        )
+    }
+    AnimatedVisibility(
+        visible = extraElementsVisible,
+        enter = fadeIn() + expandVertically(expandFrom = Alignment.Top),
+        exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut()
+    ) {
+        Box(
+            modifier = Modifier.sizeIn(maxWidth = 280.dp),
         ) {
-            ShortenRequestElements(
-                component = component,
-                fillMaxWidth = false,
-                maxTextFieldWidth = maxWidth / 2
+            val calendarState = rememberSelectableCalendarState(
+                initialMonth = YearMonth.now(),
+                minMonth = YearMonth.now(),
+                initialSelection = listOf(expirationDate),
+                confirmSelectionChange = { component.onExpirationDateTimeChange(it.singleOrNull()) },
             )
+            SelectableCalendar(calendarState = calendarState)
         }
     }
-
 }
 
 @Composable

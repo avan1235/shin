@@ -32,6 +32,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(libs.ktor.shared.resources)
+            implementation(libs.kotlinx.datetime)
         }
     }
 }

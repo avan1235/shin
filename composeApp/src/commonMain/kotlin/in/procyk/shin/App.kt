@@ -55,14 +55,17 @@ fun ShinApp(component: ShinComponent) {
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth(),
                     )
-                    Spacer(Modifier.size(32.dp))
+                    Spacer(Modifier.size(16.dp))
+
+                    val shortenedUrl by component.shortenedUrl.subscribeAsState()
+                    ShortenResponse(shortenedUrl.toNullable())
+
+                    Spacer(Modifier.size(16.dp))
                     ShortenRequest(
                         component = component,
                         maxWidth = maxWidth,
                         isVertical = isVertical,
                     )
-                    val shortenedUrl by component.shortenedUrl.subscribeAsState()
-                    ShortenResponse(shortenedUrl.toNullable())
                 }
             }
         }
