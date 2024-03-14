@@ -35,7 +35,7 @@ interface ShinComponent : Component {
 
     fun onExtraElementsVisibleChange()
 
-    fun onExpirationDateTimeChange(expirationDate: LocalDate?): Boolean
+    fun onExpirationDateChange(expirationDate: LocalDate?): Boolean
 
     fun onUrlChange(url: String)
 
@@ -72,7 +72,7 @@ class ShinComponentImpl(
         _extraElementsVisible.update { !it }
     }
 
-    override fun onExpirationDateTimeChange(expirationDate: LocalDate?): Boolean = when {
+    override fun onExpirationDateChange(expirationDate: LocalDate?): Boolean = when {
         expirationDate == null -> {
             val updatedDate = tomorrow
             _expirationDate.update { updatedDate }

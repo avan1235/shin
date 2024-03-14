@@ -95,14 +95,19 @@ private fun ShortenRequestExtraElements(
         enter = fadeIn() + expandVertically(expandFrom = Alignment.Top),
         exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut()
     ) {
-        Box(
-            modifier = Modifier.sizeIn(maxWidth = 280.dp),
+        Column(
+            modifier = Modifier
+                .padding(top = 12.dp)
+                .sizeIn(maxWidth = 280.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp, alignment = Alignment.CenterVertically),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            Text("Expiration Date", style = MaterialTheme.typography.headlineSmall)
             val calendarState = rememberSelectableCalendarState(
                 initialMonth = YearMonth.now(),
                 minMonth = YearMonth.now(),
                 initialSelection = listOf(expirationDate),
-                confirmSelectionChange = { component.onExpirationDateTimeChange(it.singleOrNull()) },
+                confirmSelectionChange = { component.onExpirationDateChange(it.singleOrNull()) },
             )
             SelectableCalendar(calendarState = calendarState)
         }
