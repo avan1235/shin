@@ -27,6 +27,7 @@ import `in`.procyk.compose.calendar.rememberSelectableCalendarState
 import `in`.procyk.compose.calendar.year.YearMonth
 import `in`.procyk.shin.component.ShinComponent
 import `in`.procyk.shin.model.ShortenedProtocol
+import toNullable
 
 @Composable
 internal fun ShortenRequest(
@@ -80,7 +81,6 @@ private fun ShortenRequestExtraElements(
     component: ShinComponent,
 ) {
     val extraElementsVisible by component.extraElementsVisible.subscribeAsState()
-    val expirationDate by component.expirationDate.subscribeAsState()
     val rotation by animateFloatAsState(if (extraElementsVisible) 180f else 0f)
     OutlinedButton(onClick = component::onExtraElementsVisibleChange) {
         Text("Extra Options")
@@ -90,11 +90,7 @@ private fun ShortenRequestExtraElements(
             contentDescription = "Extra Options"
         )
     }
-    AnimatedVisibility(
-        visible = extraElementsVisible,
-        enter = fadeIn() + expandVertically(expandFrom = Alignment.Top),
-        exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut()
-    ) {
+    VerticalAnimatedVisibility(extraElementsVisible) {
         Column(
             modifier = Modifier
                 .padding(top = 12.dp)
@@ -102,14 +98,27 @@ private fun ShortenRequestExtraElements(
             verticalArrangement = Arrangement.spacedBy(4.dp, alignment = Alignment.CenterVertically),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text("Expiration Date", style = MaterialTheme.typography.headlineSmall)
-            val calendarState = rememberSelectableCalendarState(
-                initialMonth = YearMonth.now(),
-                minMonth = YearMonth.now(),
-                initialSelection = listOf(expirationDate),
-                confirmSelectionChange = { component.onExpirationDateChange(it.singleOrNull()) },
-            )
-            SelectableCalendar(calendarState = calendarState)
+            val expirationDate by component.expirationDate.subscribeAsState()
+            val expirationDateVisible by component.expirationDateVisible.subscribeAsState()
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Expiration Date", fontSize = 16.sp)
+                Switch(
+                    checked = expirationDateVisible,
+                    onCheckedChange = component::onExpirationDateVisibleChange
+                )
+            }
+            VerticalAnimatedVisibility(expirationDateVisible) {
+                val calendarState = rememberSelectableCalendarState(
+                    initialMonth = YearMonth.now(),
+                    minMonth = YearMonth.now(),
+                    initialSelection = listOf(expirationDate),
+                    confirmSelectionChange = { component.onExpirationDateChange(it.singleOrNull()) },
+                )
+                SelectableCalendar(calendarState = calendarState)
+            }
         }
     }
 }
@@ -210,4 +219,17 @@ private fun ProtocolChooser(
             }
         }
     }
+}
+
+@Composable
+private inline fun VerticalAnimatedVisibility(
+    visible: Boolean,
+    crossinline content: @Composable() AnimatedVisibilityScope.() -> Unit,
+) {
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn() + expandVertically(expandFrom = Alignment.Top),
+        exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut(),
+        content = { content() }
+    )
 }

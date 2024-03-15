@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.*
 import kotlinx.datetime.Clock.System.now
 import toLocalDate
+import toNullable
 
 
 interface ShinComponent : Component {
@@ -26,6 +27,8 @@ interface ShinComponent : Component {
     val extraElementsVisible: Value<Boolean>
 
     val expirationDate: Value<LocalDate>
+
+    val expirationDateVisible: Value<Boolean>
 
     val url: Value<String>
 
@@ -36,6 +39,8 @@ interface ShinComponent : Component {
     fun onExtraElementsVisibleChange()
 
     fun onExpirationDateChange(expirationDate: LocalDate?): Boolean
+
+    fun onExpirationDateVisibleChange(visible: Boolean)
 
     fun onUrlChange(url: String)
 
@@ -58,6 +63,9 @@ class ShinComponentImpl(
 
     private val _expirationDate = MutableStateFlow(tomorrow)
     override val expirationDate: Value<LocalDate> = _expirationDate.asValue()
+
+    private val _expirationDateVisible = MutableStateFlow(false)
+    override val expirationDateVisible: Value<Boolean> = _expirationDateVisible.asValue()
 
     private val _url = MutableStateFlow("")
     override val url: Value<String> = _url.asValue()
@@ -87,6 +95,10 @@ class ShinComponentImpl(
         }
     }
 
+    override fun onExpirationDateVisibleChange(visible: Boolean) {
+        _expirationDateVisible.update { visible }
+    }
+
     override fun onUrlChange(url: String) {
         val (updatedUrl, updatedProtocol) = ShortenedProtocol.simplifyInputUrl(url)
         updatedProtocol?.let { protocol -> _protocol.update { protocol } }
@@ -107,7 +119,7 @@ class ShinComponentImpl(
             httpClient.requestShortenedUrl(
                 url = _url.value,
                 shortenedProtocol = _protocol.value,
-                expirationDate = _expirationDate.value.takeIfVisible(),
+                expirationDate = _expirationDate.value.takeIfExtraElementsVisibleAnd(expirationDateVisible),
                 onResponse = { response ->
                     val some = Some(response)
                     _shortenedUrl.update { some }
@@ -117,8 +129,8 @@ class ShinComponentImpl(
         }
     }
 
-    private inline fun <T> T.takeIfVisible(): T? =
-        takeIf { _extraElementsVisible.value }
+    private inline fun <T> T.takeIfExtraElementsVisibleAnd(value: Value<Boolean>): T? =
+        takeIf { _extraElementsVisible.value && value.value }
 }
 
 private suspend fun HttpClient.requestShortenedUrl(
