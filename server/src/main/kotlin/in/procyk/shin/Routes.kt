@@ -10,16 +10,15 @@ import io.github.cdimascio.dotenv.Dotenv
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
-import io.ktor.server.resources.*
-import io.ktor.server.resources.get as getResource
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.util.pipeline.*
 import kotlinx.coroutines.*
-import io.ktor.server.routing.post as postBody
 import org.koin.ktor.ext.inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
+import io.ktor.server.resources.get as getResource
+import io.ktor.server.routing.post as postBody
 
 @OptIn(DelicateCoroutinesApi::class)
 internal fun Application.installRoutes(): Routing = routing {

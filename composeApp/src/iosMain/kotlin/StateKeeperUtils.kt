@@ -21,7 +21,8 @@ fun save(coder: NSCoder, state: SerializableContainer) {
 @Suppress("unused")
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 fun restore(coder: NSCoder): SerializableContainer? {
-    val string = coder.decodeTopLevelObjectOfClass(aClass = NSString, forKey = STATE_KEY, error = null) as? String? ?: return null
+    val string = coder.decodeTopLevelObjectOfClass(aClass = NSString, forKey = STATE_KEY, error = null) as? String?
+        ?: return null
     return try {
         json.decodeFromString(SerializableContainer.serializer(), string)
     } catch (e: Exception) {
