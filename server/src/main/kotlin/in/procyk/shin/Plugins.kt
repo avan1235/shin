@@ -35,5 +35,8 @@ private fun Application.installCors(dotenv: Dotenv) {
     install(CORS) {
         allowHost("${corsHost}:${corsPort}", schemes = listOf(corsScheme))
         allowMethod(HttpMethod.Post)
+        allowHeader(HttpHeaders.ContentType)
+        allowHeader(HttpHeaders.ContentLength)
+        allowNonSimpleContentTypes = true
     }
 }
