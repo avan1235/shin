@@ -1,2 +1,3 @@
 -keep class io.ktor.client.engine.java.JavaHttpEngineContainer
+-keep class kotlinx.coroutines.swing.SwingDispatcherFactory
 -dontwarn org.slf4j.**
