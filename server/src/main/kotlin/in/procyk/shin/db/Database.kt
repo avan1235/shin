@@ -1,5 +1,6 @@
 package `in`.procyk.shin.db
 
+import RedirectType
 import `in`.procyk.shin.util.env
 import io.github.cdimascio.dotenv.Dotenv
 import org.jetbrains.exposed.sql.Database
@@ -14,6 +15,7 @@ object Database {
             password = dotenv.env("POSTGRES_PASSWORD"),
         )
         transaction {
+            exec(CREATE_REDIRECT_TYPE)
             SchemaUtils.createMissingTablesAndColumns(ShortUrls)
         }
     }

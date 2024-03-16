@@ -3,14 +3,16 @@ package `in`.procyk.shin.component
 import Option
 import Option.None
 import Option.Some
+import RedirectType
+import SHORTEN_PATH
+import ShinCbor
 import Shorten
-import ShortenExpiring
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.Value
 import `in`.procyk.shin.createHttpClient
 import `in`.procyk.shin.model.ShortenedProtocol
 import io.ktor.client.*
-import io.ktor.client.plugins.resources.*
+import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,8 +20,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.*
 import kotlinx.datetime.Clock.System.now
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.encodeToByteArray
 import toLocalDate
-import toNullable
 
 
 interface ShinComponent : Component {
@@ -29,6 +32,10 @@ interface ShinComponent : Component {
     val expirationDate: Value<LocalDate>
 
     val expirationDateVisible: Value<Boolean>
+
+    val redirectType: Value<RedirectType>
+
+    val redirectTypeVisible: Value<Boolean>
 
     val url: Value<String>
 
@@ -41,6 +48,10 @@ interface ShinComponent : Component {
     fun onExpirationDateChange(expirationDate: LocalDate?): Boolean
 
     fun onExpirationDateVisibleChange(visible: Boolean)
+
+    fun onRedirectTypeChange(redirectType: RedirectType)
+
+    fun onRedirectTypeVisibleChange(visible: Boolean)
 
     fun onUrlChange(url: String)
 
@@ -66,6 +77,12 @@ class ShinComponentImpl(
 
     private val _expirationDateVisible = MutableStateFlow(false)
     override val expirationDateVisible: Value<Boolean> = _expirationDateVisible.asValue()
+
+    private val _redirectType = MutableStateFlow(RedirectType.Default)
+    override val redirectType: Value<RedirectType> = _redirectType.asValue()
+
+    private val _redirectTypeVisible = MutableStateFlow(false)
+    override val redirectTypeVisible: Value<Boolean> = _redirectTypeVisible.asValue()
 
     private val _url = MutableStateFlow("")
     override val url: Value<String> = _url.asValue()
@@ -99,6 +116,14 @@ class ShinComponentImpl(
         _expirationDateVisible.update { visible }
     }
 
+    override fun onRedirectTypeChange(redirectType: RedirectType) {
+        _redirectType.update { redirectType }
+    }
+
+    override fun onRedirectTypeVisibleChange(visible: Boolean) {
+        _redirectTypeVisible.update { visible }
+    }
+
     override fun onUrlChange(url: String) {
         val (updatedUrl, updatedProtocol) = ShortenedProtocol.simplifyInputUrl(url)
         updatedProtocol?.let { protocol -> _protocol.update { protocol } }
@@ -120,6 +145,7 @@ class ShinComponentImpl(
                 url = _url.value,
                 shortenedProtocol = _protocol.value,
                 expirationDate = _expirationDate.value.takeIfExtraElementsVisibleAnd(expirationDateVisible),
+                redirectType = _redirectType.value.takeIfExtraElementsVisibleAnd(redirectTypeVisible),
                 onResponse = { response ->
                     val some = Some(response)
                     _shortenedUrl.update { some }
@@ -133,18 +159,21 @@ class ShinComponentImpl(
         takeIf { _extraElementsVisible.value && value.value }
 }
 
+@OptIn(ExperimentalSerializationApi::class)
 private suspend fun HttpClient.requestShortenedUrl(
     url: String,
     shortenedProtocol: ShortenedProtocol,
     expirationDate: LocalDate?,
+    redirectType: RedirectType?,
     onResponse: (String) -> Unit,
     onError: (String) -> Unit,
 ) {
     try {
         val expirationAt = expirationDate?.plus(1, DateTimeUnit.DAY)?.atStartOfDayIn(TimeZone.currentSystemDefault())
-        val response = when (expirationAt) {
-            null -> post<_>(Shorten(shortenedProtocol.buildUrl(url)))
-            else -> post<_>(ShortenExpiring(shortenedProtocol.buildUrl(url), expirationAt))
+        val shorten = Shorten(shortenedProtocol.buildUrl(url), expirationAt, redirectType)
+        val response = post(SHORTEN_PATH) {
+            contentType(ContentType.Application.Cbor)
+            setBody(ShinCbor.encodeToByteArray(shorten))
         }
         response
             .takeIf { it.status == HttpStatusCode.OK }

@@ -1,9 +1,10 @@
 package `in`.procyk.shin.service
 
+import RedirectType
+import Shorten
 import `in`.procyk.shin.db.ShortUrl
 import `in`.procyk.shin.db.ShortUrls
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.isNotNull
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.lessEq
 import org.jetbrains.exposed.sql.and
@@ -16,9 +17,9 @@ import java.security.MessageDigest
 import java.util.*
 
 internal interface ShortUrlService {
-    suspend fun findOrCreateShortenedId(rawUrl: String, expirationAt: Instant?): String?
+    suspend fun findOrCreateShortenedId(shorten: Shorten): String?
 
-    suspend fun findShortenedUrl(shortenedId: String): String?
+    suspend fun findShortenedUrl(shortenedId: String): ShortenedUrl?
 
     suspend fun deleteExpiredUrls()
 }
@@ -28,10 +29,11 @@ internal fun Module.singleShortUrlService() {
 }
 
 private class ShortUrlServiceImpl : ShortUrlService {
-    override suspend fun findOrCreateShortenedId(rawUrl: String, expirationAt: Instant?): String? {
-        val url = rawUrl.normalizeAsUrl() ?: return null
+    override suspend fun findOrCreateShortenedId(shorten: Shorten): String? {
+        val url = shorten.url.normalizeUrlCase() ?: return null
 
         val id = url.sha256()
+        val expirationAt = shorten.expirationAt
         return newSuspendedTransaction txn@{
             for (n in 1..id.length) {
                 val shortId = id.take(n)
@@ -40,6 +42,7 @@ private class ShortUrlServiceImpl : ShortUrlService {
                     null -> ShortUrl.new(shortId) {
                         this.url = url
                         this.expirationAt = expirationAt
+                        this.redirectType = RedirectType.from(shorten.redirectType)
                     }.let { return@txn shortId }
 
                     url -> {
@@ -63,8 +66,10 @@ private class ShortUrlServiceImpl : ShortUrlService {
         }
     }
 
-    override suspend fun findShortenedUrl(shortenedId: String): String? = newSuspendedTransaction {
-        ShortUrl.findById(shortenedId)?.url
+    override suspend fun findShortenedUrl(shortenedId: String): ShortenedUrl? = newSuspendedTransaction {
+        ShortUrl.findById(shortenedId)
+    }?.let {
+        ShortenedUrl(it.url, it.redirectType)
     }
 
     override suspend fun deleteExpiredUrls() {
@@ -75,7 +80,12 @@ private class ShortUrlServiceImpl : ShortUrlService {
     }
 }
 
-fun String.normalizeAsUrl(): String? = try {
+data class ShortenedUrl(
+    val url: String,
+    val redirectType: RedirectType,
+)
+
+private fun String.normalizeUrlCase(): String? = try {
     val uri = URI(this)
     val normalizedUri = URI(
         uri.scheme?.lowercase(),

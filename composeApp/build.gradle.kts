@@ -72,7 +72,8 @@ kotlin {
             implementation(projects.shared)
 
             implementation(libs.ktor.client.core)
-            implementation(libs.ktor.client.resources)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.cbor)
 
             implementation(libs.procyk.compose.qrcode)
             implementation(libs.procyk.compose.calendar)

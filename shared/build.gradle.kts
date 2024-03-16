@@ -31,6 +31,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            implementation(libs.ktor.serialization.kotlinx.cbor)
             implementation(libs.ktor.shared.resources)
             implementation(libs.kotlinx.datetime)
         }

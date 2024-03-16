@@ -11,7 +11,7 @@ sealed interface Option<out A> {
     }
 }
 
-inline fun <A> Option<A>.toNullable(): A? = when (this) {
+fun <A> Option<A>.toNullable(): A? = when (this) {
     is Option.Some -> value
     else -> null
 }
