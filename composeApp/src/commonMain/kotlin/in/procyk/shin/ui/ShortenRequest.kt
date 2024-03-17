@@ -4,9 +4,12 @@ import RedirectType
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
@@ -16,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -41,12 +45,12 @@ internal fun ShortenRequest(
     space: Dp = 8.dp,
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         when {
             isVertical -> Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(
                     space = space,
                     alignment = Alignment.CenterVertically,
@@ -61,7 +65,7 @@ internal fun ShortenRequest(
             }
 
             else -> Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(
                     space = space,
                     alignment = Alignment.CenterHorizontally,
@@ -95,39 +99,43 @@ private fun ShortenRequestExtraElements(
         )
     }
     VerticalAnimatedVisibility(extraElementsVisible) {
-        Row(
+        LazyRow(
             verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
         ) {
-            HideableSettingsColumn(
-                name = "Expiration Date",
-                visible = component.expirationDateVisible,
-                modifier = Modifier.sizeIn(maxWidth = 250.dp),
-                onVisibleChange = component::onExpirationDateVisibleChange,
-            ) {
-                val expirationDate by component.expirationDate.subscribeAsState()
-                val calendarState = rememberSelectableCalendarState(
-                    initialMonth = YearMonth.now(),
-                    minMonth = YearMonth.now(),
-                    initialSelection = listOf(expirationDate),
-                    confirmSelectionChange = { component.onExpirationDateChange(it.singleOrNull()) },
-                )
-                SelectableCalendar(calendarState = calendarState)
+            item {
+                HideableSettingsColumn(
+                    name = "Expiration Date",
+                    visible = component.expirationDateVisible,
+                    modifier = Modifier.sizeIn(maxWidth = 250.dp),
+                    onVisibleChange = component::onExpirationDateVisibleChange,
+                ) {
+                    val expirationDate by component.expirationDate.subscribeAsState()
+                    val calendarState = rememberSelectableCalendarState(
+                        initialMonth = YearMonth.now(),
+                        minMonth = YearMonth.now(),
+                        initialSelection = listOf(expirationDate),
+                        confirmSelectionChange = { component.onExpirationDateChange(it.singleOrNull()) },
+                    )
+                    SelectableCalendar(calendarState = calendarState)
+                }
             }
-            HideableSettingsColumn(
-                name = "Redirect Type",
-                visible = component.redirectTypeVisible,
-                modifier = Modifier.width(width = 250.dp),
-                onVisibleChange = component::onRedirectTypeVisibleChange,
-            ) {
-                val redirectType by component.redirectType.subscribeAsState()
-                EnumChooser(
-                    label = "Redirect Type",
-                    entries = RedirectType.entries,
-                    value = redirectType,
-                    onValueChange = component::onRedirectTypeChange,
-                    presentableName = RedirectType::presentableName,
-                )
+            item {
+                HideableSettingsColumn(
+                    name = "Redirect Type",
+                    visible = component.redirectTypeVisible,
+                    modifier = Modifier.width(width = 250.dp),
+                    onVisibleChange = component::onRedirectTypeVisibleChange,
+                ) {
+                    val redirectType by component.redirectType.subscribeAsState()
+                    EnumChooser(
+                        label = "Redirect Type",
+                        entries = RedirectType.entries,
+                        value = redirectType,
+                        onValueChange = component::onRedirectTypeChange,
+                        presentableName = RedirectType::presentableName,
+                    )
+                }
             }
         }
     }
@@ -145,11 +153,11 @@ private inline fun HideableSettingsColumn(
     visible: Value<Boolean>,
     noinline onVisibleChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    crossinline content: @Composable() AnimatedVisibilityScope.() -> Unit,
+    crossinline content: @Composable() () -> Unit,
 ) {
     Column(
         modifier = modifier
-            .padding(top = 12.dp),
+            .padding(top = 12.dp, start = 6.dp, end = 6.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp, alignment = Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -164,7 +172,12 @@ private inline fun HideableSettingsColumn(
                 onCheckedChange = onVisibleChange,
             )
         }
-        VerticalAnimatedVisibility(contentVisible) {
+        val alpha by animateFloatAsState(if (contentVisible) 1f else 0f)
+        Box(
+            modifier = Modifier
+                .alpha(alpha)
+                .applyIf(!contentVisible) { height(1.dp) }
+        ) {
             content()
         }
     }
