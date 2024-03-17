@@ -144,11 +144,21 @@ class ShinComponentImpl(
             httpClient.requestShortenedUrl(
                 url = _url.value,
                 shortenedProtocol = _protocol.value,
-                expirationDate = _expirationDate.value.takeIfExtraElementsVisibleAnd(expirationDateVisible),
+                expirationDate = _expirationDate.value.takeIfExtraElementsVisibleAnd(
+                    expirationDateVisible
+                ),
                 redirectType = _redirectType.value.takeIfExtraElementsVisibleAnd(redirectTypeVisible),
-                onResponse = { response ->
-                    val some = Some(response)
-                    _shortenedUrl.update { some }
+                onResponse = { code, response ->
+                    when (code) {
+                        HttpStatusCode.OK -> {
+                            val some = Some(response)
+                            _shortenedUrl.update { some }
+                        }
+
+                        HttpStatusCode.BadRequest -> toast("Invalid URL")
+
+                        else -> toast("Unknown error")
+                    }
                 },
                 onError = { toast(it) }
             )
@@ -165,20 +175,20 @@ private suspend fun HttpClient.requestShortenedUrl(
     shortenedProtocol: ShortenedProtocol,
     expirationDate: LocalDate?,
     redirectType: RedirectType?,
-    onResponse: (String) -> Unit,
+    onResponse: (HttpStatusCode, String) -> Unit,
     onError: (String) -> Unit,
 ) {
     try {
-        val expirationAt = expirationDate?.plus(1, DateTimeUnit.DAY)?.atStartOfDayIn(TimeZone.currentSystemDefault())
+        val expirationAt = expirationDate?.plus(1, DateTimeUnit.DAY)
+            ?.atStartOfDayIn(TimeZone.currentSystemDefault())
         val shorten = Shorten(shortenedProtocol.buildUrl(url), expirationAt, redirectType)
         val response = post(SHORTEN_PATH) {
             contentType(ContentType.Application.Cbor)
             setBody(ShinCbor.encodeToByteArray(shorten))
         }
-        response
-            .takeIf { it.status == HttpStatusCode.OK }
-            ?.bodyAsText()
-            ?.let(onResponse)
+        val status = response.status
+        val body = response.bodyAsText()
+        onResponse(status, body)
     } catch (_: Exception) {
         onError("Cannot connect to Shin. Try again later…")
     }
