@@ -22,8 +22,9 @@ enum class RedirectType {
 @Serializable
 class Shorten(
     val url: String,
-    val expirationAt: Instant?,
-    val redirectType: RedirectType?,
+    val customPrefix: String? = null,
+    val expirationAt: Instant? = null,
+    val redirectType: RedirectType? = null,
 )
 
 @Resource("/{shortenedId}")

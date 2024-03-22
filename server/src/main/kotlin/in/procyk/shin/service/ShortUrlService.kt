@@ -4,6 +4,7 @@ import RedirectType
 import Shorten
 import `in`.procyk.shin.db.ShortUrl
 import `in`.procyk.shin.db.ShortUrls
+import io.ktor.http.*
 import kotlinx.datetime.Clock
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.isNotNull
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.lessEq
@@ -30,22 +31,20 @@ internal fun Module.singleShortUrlService() {
 
 private class ShortUrlServiceImpl : ShortUrlService {
     override suspend fun findOrCreateShortenedId(shorten: Shorten): String? {
-        val url = shorten.url.normalizeUrlCase() ?: return null
-
-        val id = url.sha256()
+        val shortened = shorten.createShortenedIdentifier() ?: return null
         val expirationAt = shorten.expirationAt
         return newSuspendedTransaction txn@{
-            for (n in 1..id.length) {
-                val shortId = id.take(n)
+            for (count in shortened.takeCounts) {
+                val shortId = shortened.uniqueId.take(count)
                 val existing = ShortUrl.findById(shortId)
                 when (existing?.url) {
                     null -> ShortUrl.new(shortId) {
-                        this.url = url
+                        this.url = shortened.url
                         this.expirationAt = expirationAt
                         this.redirectType = RedirectType.from(shorten.redirectType)
                     }.let { return@txn shortId }
 
-                    url -> {
+                    shortened.url -> {
                         val prevExpirationAt = existing.expirationAt
                         when {
                             prevExpirationAt == null -> return@txn shortId
@@ -105,3 +104,25 @@ private fun String.sha256(): String = MessageDigest
     .getInstance("SHA-256")
     .digest(toByteArray())
     .let(Base64.getEncoder()::encodeToString)
+
+private data class ShortenedIdentifier(
+    val url: String,
+    val uniqueId: String,
+    val takeCounts: Sequence<Int>,
+)
+
+private fun Shorten.createShortenedIdentifier(): ShortenedIdentifier? {
+    val url = url.normalizeUrlCase() ?: return null
+    val prefix = customPrefix?.encodeURLPath(encodeSlash = true, encodeEncoded = false)
+    val id = url.sha256().let { uniqueId ->
+        prefix?.let { "$it-$uniqueId" } ?: uniqueId
+    }
+    return ShortenedIdentifier(
+        url = url,
+        uniqueId = id,
+        takeCounts = sequence {
+            prefix?.let { yield(it.length) }
+            for (i in 1..id.length) yield((prefix?.let { it.length + 1 } ?: 0) + i)
+        },
+    )
+}

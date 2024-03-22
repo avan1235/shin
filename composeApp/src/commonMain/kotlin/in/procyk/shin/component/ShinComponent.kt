@@ -29,6 +29,10 @@ interface ShinComponent : Component {
 
     val extraElementsVisible: Value<Boolean>
 
+    val customPrefix: Value<String>
+
+    val customPrefixVisible: Value<Boolean>
+
     val expirationDate: Value<LocalDate>
 
     val expirationDateVisible: Value<Boolean>
@@ -44,6 +48,10 @@ interface ShinComponent : Component {
     val protocol: Value<ShortenedProtocol>
 
     fun onExtraElementsVisibleChange()
+
+    fun onCustomPrefixChange(customPrefix: String)
+
+    fun onCustomPrefixVisibleChange(visible: Boolean)
 
     fun onExpirationDateChange(expirationDate: LocalDate?): Boolean
 
@@ -72,6 +80,12 @@ class ShinComponentImpl(
     private val _extraElementsVisible = MutableStateFlow(false)
     override val extraElementsVisible: Value<Boolean> = _extraElementsVisible.asValue()
 
+    private val _customPrefix = MutableStateFlow("")
+    override val customPrefix: Value<String> = _customPrefix.asValue()
+
+    private val _customPrefixVisible = MutableStateFlow(false)
+    override val customPrefixVisible: Value<Boolean> = _customPrefixVisible.asValue()
+
     private val _expirationDate = MutableStateFlow(tomorrow)
     override val expirationDate: Value<LocalDate> = _expirationDate.asValue()
 
@@ -95,6 +109,14 @@ class ShinComponentImpl(
 
     override fun onExtraElementsVisibleChange() {
         _extraElementsVisible.update { !it }
+    }
+
+    override fun onCustomPrefixChange(customPrefix: String) {
+        _customPrefix.update { customPrefix }
+    }
+
+    override fun onCustomPrefixVisibleChange(visible: Boolean) {
+        _customPrefixVisible.update { visible }
     }
 
     override fun onExpirationDateChange(expirationDate: LocalDate?): Boolean = when {
@@ -144,9 +166,8 @@ class ShinComponentImpl(
             httpClient.requestShortenedUrl(
                 url = _url.value,
                 shortenedProtocol = _protocol.value,
-                expirationDate = _expirationDate.value.takeIfExtraElementsVisibleAnd(
-                    expirationDateVisible
-                ),
+                customPrefix = _customPrefix.value.takeIfExtraElementsVisibleAnd(customPrefixVisible),
+                expirationDate = _expirationDate.value.takeIfExtraElementsVisibleAnd(expirationDateVisible),
                 redirectType = _redirectType.value.takeIfExtraElementsVisibleAnd(redirectTypeVisible),
                 onResponse = { code, response ->
                     when (code) {
@@ -165,6 +186,7 @@ class ShinComponentImpl(
         }
     }
 
+    @Suppress("NOTHING_TO_INLINE")
     private inline fun <T> T.takeIfExtraElementsVisibleAnd(value: Value<Boolean>): T? =
         takeIf { _extraElementsVisible.value && value.value }
 }
@@ -173,6 +195,7 @@ class ShinComponentImpl(
 private suspend fun HttpClient.requestShortenedUrl(
     url: String,
     shortenedProtocol: ShortenedProtocol,
+    customPrefix: String?,
     expirationDate: LocalDate?,
     redirectType: RedirectType?,
     onResponse: (HttpStatusCode, String) -> Unit,
@@ -181,7 +204,7 @@ private suspend fun HttpClient.requestShortenedUrl(
     try {
         val expirationAt = expirationDate?.plus(1, DateTimeUnit.DAY)
             ?.atStartOfDayIn(TimeZone.currentSystemDefault())
-        val shorten = Shorten(shortenedProtocol.buildUrl(url), expirationAt, redirectType)
+        val shorten = Shorten(shortenedProtocol.buildUrl(url), customPrefix, expirationAt, redirectType)
         val response = post(SHORTEN_PATH) {
             contentType(ContentType.Application.Cbor)
             setBody(ShinCbor.encodeToByteArray(shorten))

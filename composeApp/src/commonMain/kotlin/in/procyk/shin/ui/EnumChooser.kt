@@ -14,11 +14,11 @@ import applyIf
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun <T> EnumChooser(
-    label: String,
     entries: Iterable<T>,
     value: T,
     onValueChange: (T) -> Unit,
     presentableName: T.() -> String,
+    label: String? = null,
     fillMaxWidth: Boolean = true,
     defaultWidth: Dp = 128.dp,
 ) {
@@ -31,7 +31,7 @@ internal fun <T> EnumChooser(
             readOnly = true,
             value = value.presentableName(),
             onValueChange = {},
-            label = { Text(label) },
+            label = label?.let { { Text(label) } },
             modifier = Modifier
                 .menuAnchor()
                 .height(64.dp)
@@ -55,7 +55,8 @@ internal fun <T> EnumChooser(
                     onClick = {
                         onValueChange(protocol)
                         expanded = false
-                    })
+                    },
+                )
             }
         }
     }
