@@ -7,3 +7,7 @@ docker-compose.yml
 .kotlin
 .gradle
 local.properties
+build
+server/build
+composeApp/build
+shared/build
