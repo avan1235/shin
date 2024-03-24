@@ -57,6 +57,7 @@ graalvmNative {
                 "-H:+InstallExitHandlers",
                 "-H:+ReportUnsupportedElementsAtRuntime",
                 "-H:+ReportExceptionStackTraces",
+                "-H:+StaticExecutableWithDynamicLibC",
             )
 
             imageName.set("server")

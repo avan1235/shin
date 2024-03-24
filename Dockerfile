@@ -12,7 +12,7 @@ RUN chmod +x ./gradlew
 RUN ./gradlew server:nativeCompile
 RUN /bin/upx --best --lzma ./server/build/native/nativeCompile/server
 
-FROM debian:12-slim as runner
+FROM gcr.io/distroless/base-nossl-debian12 as runner
 
 ARG POSTGRES_PORT
 ARG POSTGRES_DB
@@ -40,8 +40,7 @@ ENV CORS_SCHEME=${CORS_SCHEME}
 
 EXPOSE ${PORT}
 
-WORKDIR /home
-
+WORKDIR /
 COPY --from=builder /app/server/build/native/nativeCompile/server ./server
 
-ENTRYPOINT ["/home/server"]
+ENTRYPOINT ["/server"]
