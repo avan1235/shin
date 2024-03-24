@@ -1,8 +1,16 @@
 FROM container-registry.oracle.com/graalvm/native-image:17 AS builder
+RUN curl -sSL $(curl -s https://api.github.com/repos/upx/upx/releases/latest | \
+    grep browser_download_url | \
+    grep amd64 | \
+    cut -d '"' -f 4) -o upx.tar.xz
+RUN microdnf install findutils xz
+RUN tar -xf upx.tar.xz && \
+    cd upx-*-amd64_linux && \
+    mv upx /bin/upx
 COPY . .
-RUN microdnf install findutils
 RUN chmod +x ./gradlew
 RUN ./gradlew server:nativeCompile
+RUN /bin/upx --best --lzma ./server/build/native/nativeCompile/server
 
 FROM debian:12-slim as runner
 
