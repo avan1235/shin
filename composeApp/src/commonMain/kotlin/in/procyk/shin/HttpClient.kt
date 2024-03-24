@@ -1,6 +1,6 @@
 package `in`.procyk.shin
 
-import ShinCbor
+import `in`.procyk.shin.shared.ShinCbor
 import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*

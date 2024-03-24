@@ -1,6 +1,6 @@
 package `in`.procyk.shin.ui
 
-import RedirectType
+import `in`.procyk.shin.shared.RedirectType
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.horizontalScroll
@@ -30,7 +30,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import applyIf
+import `in`.procyk.shin.shared.applyIf
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.arkivanov.decompose.value.Value
 import `in`.procyk.compose.calendar.SelectableCalendar

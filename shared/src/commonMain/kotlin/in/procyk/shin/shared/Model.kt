@@ -1,3 +1,5 @@
+package `in`.procyk.shin.shared
+
 import io.ktor.resources.*
 import kotlinx.datetime.Instant
 import kotlinx.serialization.ExperimentalSerializationApi

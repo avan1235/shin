@@ -12,6 +12,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import `in`.procyk.shin.component.ShinComponent
+import `in`.procyk.shin.shared.applyIf
+import `in`.procyk.shin.shared.toNullable
 import `in`.procyk.shin.ui.ShortenRequestItems
 import `in`.procyk.shin.ui.ShortenResponse
 import `in`.procyk.shin.ui.theme.ShinTheme

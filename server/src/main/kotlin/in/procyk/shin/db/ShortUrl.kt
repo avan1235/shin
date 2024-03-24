@@ -1,6 +1,6 @@
 package `in`.procyk.shin.db
 
-import RedirectType
+import `in`.procyk.shin.shared.RedirectType
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.id.EntityID

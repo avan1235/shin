@@ -1,7 +1,7 @@
 package `in`.procyk.shin.service
 
-import RedirectType
-import Shorten
+import `in`.procyk.shin.shared.RedirectType
+import `in`.procyk.shin.shared.Shorten
 import `in`.procyk.shin.db.ShortUrl
 import `in`.procyk.shin.db.ShortUrls
 import io.ktor.http.*

@@ -1,6 +1,6 @@
 package `in`.procyk.shin
 
-import ShinCbor
+import `in`.procyk.shin.shared.ShinCbor
 import `in`.procyk.shin.util.env
 import io.github.cdimascio.dotenv.Dotenv
 import io.ktor.http.*

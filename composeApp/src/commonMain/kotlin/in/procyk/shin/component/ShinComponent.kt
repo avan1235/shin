@@ -1,12 +1,12 @@
 package `in`.procyk.shin.component
 
-import Option
-import Option.None
-import Option.Some
-import RedirectType
-import SHORTEN_PATH
-import ShinCbor
-import Shorten
+import `in`.procyk.shin.shared.Option
+import `in`.procyk.shin.shared.Option.None
+import `in`.procyk.shin.shared.Option.Some
+import `in`.procyk.shin.shared.RedirectType
+import `in`.procyk.shin.shared.SHORTEN_PATH
+import `in`.procyk.shin.shared.ShinCbor
+import `in`.procyk.shin.shared.Shorten
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.Value
 import `in`.procyk.shin.createHttpClient

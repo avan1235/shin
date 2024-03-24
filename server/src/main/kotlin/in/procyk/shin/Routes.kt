@@ -1,9 +1,9 @@
 package `in`.procyk.shin
 
-import Decode
-import RedirectType
-import SHORTEN_PATH
-import Shorten
+import `in`.procyk.shin.shared.Decode
+import `in`.procyk.shin.shared.RedirectType
+import `in`.procyk.shin.shared.SHORTEN_PATH
+import `in`.procyk.shin.shared.Shorten
 import `in`.procyk.shin.service.ShortUrlService
 import `in`.procyk.shin.util.env
 import io.github.cdimascio.dotenv.Dotenv

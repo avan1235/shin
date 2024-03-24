@@ -1,3 +1,5 @@
+package `in`.procyk.shin.shared
+
 import kotlin.jvm.JvmInline
 
 sealed interface Option<out A> {
