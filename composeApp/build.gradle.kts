@@ -91,12 +91,14 @@ kotlin {
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.ktor.client.java)
         }
-        iosMain.dependencies {
-            api(libs.decompose)
-            api(libs.essenty.lifecycle)
-            api(libs.essenty.statekeeper)
+        if (currentOS().isMacOsX) {
+            iosMain.dependencies {
+                api(libs.decompose)
+                api(libs.essenty.lifecycle)
+                api(libs.essenty.statekeeper)
 
-            implementation(libs.ktor.client.darwin)
+                implementation(libs.ktor.client.darwin)
+            }
         }
         wasmJsMain.dependencies {
             implementation(libs.ktor.client.js)

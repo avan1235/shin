@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.kotlinJvm)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.ktor)
+    alias(libs.plugins.graalVM)
     application
 }
 
@@ -18,7 +19,7 @@ dependencies {
 
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.cors)
-    implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.server.cio)
     implementation(libs.ktor.server.resources)
     implementation(libs.ktor.server.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.cbor)
@@ -34,4 +35,31 @@ dependencies {
 
     testImplementation(libs.ktor.server.tests)
     testImplementation(libs.kotlin.test.junit)
+}
+
+graalvmNative {
+    binaries {
+        named("main") {
+            resources.autodetect()
+            fallback.set(false)
+            verbose.set(true)
+
+            buildArgs(
+                "--initialize-at-build-time=ch.qos.logback",
+                "--initialize-at-build-time=io.ktor,kotlin",
+                "--initialize-at-build-time=org.slf4j.LoggerFactory",
+
+                "--initialize-at-build-time=kotlinx.serialization.modules.SerializersModuleKt",
+                "--initialize-at-build-time=kotlinx.serialization.cbor.Cbor\$Default",
+                "--initialize-at-build-time=kotlinx.serialization.cbor.Cbor",
+                "--initialize-at-build-time=kotlinx.serialization.cbor.CborImpl",
+
+                "-H:+InstallExitHandlers",
+                "-H:+ReportUnsupportedElementsAtRuntime",
+                "-H:+ReportExceptionStackTraces",
+            )
+
+            imageName.set("server")
+        }
+    }
 }

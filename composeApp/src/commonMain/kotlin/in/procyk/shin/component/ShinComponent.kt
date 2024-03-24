@@ -1,16 +1,12 @@
 package `in`.procyk.shin.component
 
-import `in`.procyk.shin.shared.Option
 import `in`.procyk.shin.shared.Option.None
 import `in`.procyk.shin.shared.Option.Some
-import `in`.procyk.shin.shared.RedirectType
-import `in`.procyk.shin.shared.SHORTEN_PATH
-import `in`.procyk.shin.shared.ShinCbor
-import `in`.procyk.shin.shared.Shorten
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.Value
 import `in`.procyk.shin.createHttpClient
 import `in`.procyk.shin.model.ShortenedProtocol
+import `in`.procyk.shin.shared.*
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*

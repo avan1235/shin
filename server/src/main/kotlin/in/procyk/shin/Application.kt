@@ -6,7 +6,7 @@ import `in`.procyk.shin.util.env
 import io.github.cdimascio.dotenv.Dotenv
 import io.github.cdimascio.dotenv.dotenv
 import io.ktor.server.engine.*
-import io.ktor.server.netty.*
+import io.ktor.server.cio.*
 import org.koin.dsl.module
 
 
@@ -21,7 +21,7 @@ fun main() {
         singleShortUrlService()
     }
     embeddedServer(
-        factory = Netty,
+        factory = CIO,
         host = dotenv.env("HOST"),
         port = dotenv.env("PORT")
     ) {

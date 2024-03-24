@@ -1,9 +1,10 @@
-FROM amazoncorretto:17 AS builder
+FROM container-registry.oracle.com/graalvm/native-image:17 AS builder
 COPY . .
+RUN microdnf install findutils
 RUN chmod +x ./gradlew
-RUN ./gradlew server:shadowJar
+RUN ./gradlew server:nativeCompile
 
-FROM amazoncorretto:17 as runner
+FROM debian:12-slim as runner
 
 ARG POSTGRES_PORT
 ARG POSTGRES_DB
@@ -31,6 +32,8 @@ ENV CORS_SCHEME=${CORS_SCHEME}
 
 EXPOSE ${PORT}
 
-COPY --from=builder ./server/build/libs/server-all.jar ./server.jar
+WORKDIR /home
 
-ENTRYPOINT ["java", "-jar", "server.jar"]
+COPY --from=builder /app/server/build/native/nativeCompile/server ./server
+
+ENTRYPOINT ["/home/server"]
