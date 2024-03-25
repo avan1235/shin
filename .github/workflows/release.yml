@@ -175,19 +175,19 @@ jobs:
       - name: Upload debug artifact file to workflow run results
         uses: actions/upload-artifact@v3
         with:
-          name: OpenOTP-Debug-${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}.apk
+          name: Shin-Debug-${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}.apk
           path: composeApp/build/outputs/apk/debug/composeApp-debug.apk
 
       - name: Upload release artifact file to workflow run results
         uses: actions/upload-artifact@v3
         with:
-          name: OpenOTP-Release-${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}.apk
+          name: Shin-Release-${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}.apk
           path: composeApp/build/outputs/apk/release/composeApp-release.apk
 
       - name: Upload release bundle file to workflow run results
         uses: actions/upload-artifact@v3
         with:
-          name: OpenOTP-Release-${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}.aab
+          name: Shin-Release-${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}.aab
           path: composeApp/build/outputs/bundle/release/composeApp-release.aab
 
       - name: Upload debug artifact file to release
@@ -197,7 +197,7 @@ jobs:
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
           asset_path: ./composeApp/build/outputs/apk/debug/composeApp-debug.apk
-          asset_name: OpenOTP-Debug-${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}.apk
+          asset_name: Shin-Debug-${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}.apk
           asset_content_type: application/vnd.android.package-archive
 
       - name: Upload release artifact file to release
@@ -207,7 +207,7 @@ jobs:
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
           asset_path: ./composeApp/build/outputs/apk/release/composeApp-release.apk
-          asset_name: OpenOTP-Release-${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}.apk
+          asset_name: Shin-Release-${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}.apk
           asset_content_type: application/vnd.android.package-archive
 
       - name: Upload release bundle file to release
@@ -217,7 +217,7 @@ jobs:
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
           asset_path: ./composeApp/build/outputs/bundle/release/composeApp-release.aab
-          asset_name: OpenOTP-Release-${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}.aab
+          asset_name: Shin-Release-${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}.aab
           asset_content_type: application/x-authorware-bin
 
       - name: Upload release bundle file to Google Play
@@ -225,11 +225,10 @@ jobs:
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
-          packageName: ml.dev.kotlin.openotp.OpenOtp
+          packageName: in.procyk.shin
           releaseFiles: ./composeApp/build/outputs/bundle/release/composeApp-release.aab
           track: production
           releaseName: ${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}
-          whatsNewDirectory: ./composeApp/distribution/
         env:
           PUBLISH_TO_GOOGLE_PLAY: ${{secrets.PUBLISH_TO_GOOGLE_PLAY}}
 
