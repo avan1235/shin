@@ -11,9 +11,7 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -28,12 +26,18 @@ import androidx.compose.ui.unit.sp
 internal fun ShortenResponse(
     shortenedUrl: String?,
 ) {
+    var lastShortenedUrl by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(shortenedUrl) {
+        if (shortenedUrl != null) {
+            lastShortenedUrl = shortenedUrl
+        }
+    }
     AnimatedVisibility(
         visible = shortenedUrl != null,
         enter = expandVertically(expandFrom = Alignment.Top),
         exit = shrinkVertically(shrinkTowards = Alignment.Top),
     ) {
-        shortenedUrl?.let { url ->
+        (shortenedUrl ?: lastShortenedUrl)?.let { url ->
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp, alignment = Alignment.CenterVertically)
