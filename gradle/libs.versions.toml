@@ -1,11 +1,15 @@
 [versions]
 agp = "8.2.2"
+# @keep
 android-compileSdk = "34"
+# @keep
 android-minSdk = "26"
+# @keep
 android-targetSdk = "34"
 androidx-activityCompose = "1.8.2"
 jetbrains-compose = "1.6.1"
 exposed = "0.47.0"
+# @pin
 kotlin = "1.9.23"
 ktor-server = "2.3.9"
 ktor-client = "3.0.0-wasm2"
@@ -22,6 +26,8 @@ essenty = "2.0.0-alpha07"
 dotenvGradle = "4.0.0"
 buildKonfig = "0.15.1"
 graalVM = "0.10.1"
+# @keep
+versionCode = "22"
 
 [libraries]
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }

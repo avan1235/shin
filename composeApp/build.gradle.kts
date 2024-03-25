@@ -3,6 +3,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.getCurrentOperatingSystem as currentOS
+import java.lang.System.getenv
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -118,8 +119,8 @@ android {
         applicationId = "in.procyk.shin"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = getAndBumpVersionCode()
+        versionName = getenv()["VERSION"] ?: "1.0.0"
     }
     packaging {
         resources {
@@ -127,8 +128,13 @@ android {
         }
     }
     buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "compose-android.pro",
+            )
         }
     }
     compileOptions {
@@ -178,4 +184,26 @@ buildkonfig {
         buildConfigField(Type.STRING, "CLIENT_HOST", env.CLIENT_HOST.value)
         buildConfigField(Type.STRING, "CLIENT_PROTOCOL", env.CLIENT_PROTOCOL.value)
     }
+}
+
+fun getAndBumpVersionCode(): Int {
+    val code = libs.versions.versionCode.get().toInt()
+    val bump = getenv()["BUMP_FILE_VERSION_CODE"]?.toBooleanStrictOrNull() ?: false
+    if (!bump) return code
+
+    val file = File("gradle/libs.versions.toml")
+    val updatedFile = file.readLines().map { line ->
+        if (!line.startsWith("versionCode")) return@map line
+
+        val currentVersionCode = line
+            .dropWhile { it != '"' }
+            .removePrefix("\"")
+            .takeWhile { it != '"' }
+            .toInt()
+        if (currentVersionCode != code) throw IllegalStateException("Two different version codes: $code vs $currentVersionCode")
+
+        """versionCode = "${currentVersionCode + 1}""""
+    }.joinToString(separator = "\n")
+    file.writeText(updatedFile)
+    return code
 }
