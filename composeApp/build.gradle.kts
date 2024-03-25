@@ -54,7 +54,23 @@ kotlin {
             }
         }
     }
+
+    applyDefaultHierarchyTemplate()
+
     sourceSets {
+        all {
+            languageSettings.apply {
+                optIn("androidx.compose.material3.ExperimentalMaterial3Api")
+                optIn("androidx.compose.ui.ExperimentalComposeUiApi")
+                optIn("com.arkivanov.decompose.ExperimentalDecomposeApi")
+                optIn("kotlinx.cinterop.BetaInteropApi")
+                optIn("kotlinx.cinterop.ExperimentalForeignApi")
+                optIn("kotlinx.coroutines.DelicateCoroutinesApi")
+                optIn("kotlinx.serialization.ExperimentalSerializationApi")
+                optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
+            }
+        }
+
         val desktopMain by getting
         val wasmJsMain by getting
 

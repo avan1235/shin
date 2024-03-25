@@ -11,7 +11,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import `in`.procyk.shin.shared.applyIf
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun <T> EnumChooser(
     entries: Iterable<T>,

@@ -7,7 +7,6 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.arkivanov.decompose.DefaultComponentContext
-import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.lifecycle.LifecycleController
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import `in`.procyk.shin.ShinApp
@@ -15,7 +14,6 @@ import `in`.procyk.shin.component.ShinAppComponentContext
 import `in`.procyk.shin.component.ShinComponentImpl
 import `in`.procyk.shin.runOnUiThread
 
-@OptIn(ExperimentalDecomposeApi::class)
 fun main() {
     val lifecycle = LifecycleRegistry()
     val component = runOnUiThread {

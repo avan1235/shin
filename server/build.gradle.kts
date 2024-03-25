@@ -13,6 +13,15 @@ application {
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=${extra["development"] ?: "false"}")
 }
 
+kotlin {
+    compilerOptions {
+        optIn = listOf(
+            "kotlinx.coroutines.DelicateCoroutinesApi",
+            "kotlinx.serialization.ExperimentalSerializationApi",
+        )
+    }
+}
+
 dependencies {
     implementation(projects.shared)
     implementation(libs.logback)

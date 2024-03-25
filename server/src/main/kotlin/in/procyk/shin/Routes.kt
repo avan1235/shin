@@ -20,7 +20,6 @@ import kotlin.time.Duration.Companion.hours
 import io.ktor.server.resources.get as getResource
 import io.ktor.server.routing.post as postBody
 
-@OptIn(DelicateCoroutinesApi::class)
 internal fun Application.installRoutes(): Routing = routing {
     val service by inject<ShortUrlService>()
     val dotenv by inject<Dotenv>()

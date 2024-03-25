@@ -1,6 +1,4 @@
 import com.arkivanov.essenty.statekeeper.SerializableContainer
-import kotlinx.cinterop.BetaInteropApi
-import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.serialization.json.Json
 import platform.Foundation.NSCoder
 import platform.Foundation.NSString
@@ -19,7 +17,6 @@ fun save(coder: NSCoder, state: SerializableContainer) {
 }
 
 @Suppress("unused")
-@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 fun restore(coder: NSCoder): SerializableContainer? {
     val string = coder.decodeTopLevelObjectOfClass(aClass = NSString, forKey = STATE_KEY, error = null) as? String?
         ?: return null

@@ -19,12 +19,10 @@ import `in`.procyk.shin.shared.toNullable
 import `in`.procyk.shin.ui.ShortenRequestItems
 import `in`.procyk.shin.ui.ShortenResponse
 import `in`.procyk.shin.ui.theme.ShinTheme
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.Font
 import shin.composeapp.generated.resources.Mansalva_Regular
 import shin.composeapp.generated.resources.Res
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun ShinApp(component: ShinComponent) {
     ShinTheme {

@@ -2,7 +2,6 @@ package `in`.procyk.shin.shared
 
 import io.ktor.resources.*
 import kotlinx.datetime.Instant
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.Cbor
 
@@ -32,7 +31,6 @@ class Shorten(
 @Resource("/{shortenedId}")
 class Decode(val shortenedId: String)
 
-@OptIn(ExperimentalSerializationApi::class)
 val ShinCbor = Cbor {
     encodeDefaults = true
     ignoreUnknownKeys = true

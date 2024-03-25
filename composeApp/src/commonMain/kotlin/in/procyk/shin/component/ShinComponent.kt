@@ -1,12 +1,12 @@
 package `in`.procyk.shin.component
 
-import `in`.procyk.shin.shared.Option.None
-import `in`.procyk.shin.shared.Option.Some
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.Value
 import `in`.procyk.shin.createHttpClient
 import `in`.procyk.shin.model.ShortenedProtocol
 import `in`.procyk.shin.shared.*
+import `in`.procyk.shin.shared.Option.None
+import `in`.procyk.shin.shared.Option.Some
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.*
 import kotlinx.datetime.Clock.System.now
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToByteArray
 import toLocalDate
 
@@ -187,7 +186,6 @@ class ShinComponentImpl(
         takeIf { _extraElementsVisible.value && value.value }
 }
 
-@OptIn(ExperimentalSerializationApi::class)
 private suspend fun HttpClient.requestShortenedUrl(
     url: String,
     shortenedProtocol: ShortenedProtocol,

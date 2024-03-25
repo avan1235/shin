@@ -9,11 +9,9 @@ import io.ktor.server.application.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.resources.*
-import kotlinx.serialization.ExperimentalSerializationApi
 import org.koin.core.module.Module
 import org.koin.ktor.plugin.Koin
 
-@OptIn(ExperimentalSerializationApi::class)
 internal fun Application.installPlugins(
     dotenv: Dotenv,
     appModule: Module,

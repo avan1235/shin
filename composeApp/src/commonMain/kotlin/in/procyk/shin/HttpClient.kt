@@ -6,9 +6,7 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.cbor.*
-import kotlinx.serialization.ExperimentalSerializationApi
 
-@OptIn(ExperimentalSerializationApi::class)
 internal fun createHttpClient(): HttpClient = HttpClient {
     install(ContentNegotiation) {
         cbor(ShinCbor)
