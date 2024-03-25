@@ -43,8 +43,8 @@ fun ShinApp(component: ShinComponent) {
                         .onKeyEvent { event -> event.isEscDown.also { if (it) component.onShortenedUrlReset() } },
                     verticalArrangement = Arrangement.spacedBy(16.dp, alignment = Alignment.CenterVertically),
                     horizontalAlignment = Alignment.CenterHorizontally,
+                    contentPadding = PaddingValues(vertical = 16.dp)
                 ) {
-                    item { }
                     item {
                         Text(
                             text = "Shin",
@@ -69,7 +69,6 @@ fun ShinApp(component: ShinComponent) {
                         maxWidth = maxWidth,
                         isVertical = isVertical,
                     )
-                    item { }
                 }
             }
         }
