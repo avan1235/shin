@@ -4,6 +4,7 @@ docker-compose.yml
 .gitignore
 .git
 .idea
+.fleet
 .kotlin
 .gradle
 local.properties
