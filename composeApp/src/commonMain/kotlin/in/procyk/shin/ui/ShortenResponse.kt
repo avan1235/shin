@@ -40,9 +40,13 @@ internal fun ShortenResponse(
         (shortenedUrl ?: lastShortenedUrl)?.let { url ->
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp, alignment = Alignment.CenterVertically)
+                verticalArrangement = Arrangement.spacedBy(16.dp, alignment = Alignment.CenterVertically),
+                modifier = Modifier.padding(vertical = 32.dp)
             ) {
-                Spacer(Modifier.height(16.dp))
+                QrCode(
+                    url = url,
+                    modifier = Modifier.sizeIn(maxWidth = 192.dp, maxHeight = 192.dp),
+                )
                 val color = MaterialTheme.colorScheme.primary
                 val annotatedString = remember(url, color) {
                     buildAnnotatedString {
@@ -88,14 +92,11 @@ internal fun ShortenResponse(
                             }
                     }
                 )
-                Spacer(Modifier.height(16.dp))
-                QrCode(url)
                 OutlinedButton(
                     onClick = { clipboardManager.setText(AnnotatedString(url)) },
                 ) {
                     Text("Copy to Clipboard")
                 }
-                Spacer(Modifier.height(8.dp))
             }
         }
     }
