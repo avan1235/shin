@@ -160,6 +160,8 @@ jobs:
         if: job.status == 'success'
         run: |
           export GRADLE_USER_HOME=$(pwd)/.gradle
+          export CLIENT_HOST=${{ secrets.CLIENT_HOST }}
+          export CLIENT_PROTOCOL=https
           chmod +x ./gradlew
           export BUMP_FILE_VERSION_CODE=false
           ./gradlew composeApp:assembleDebug
