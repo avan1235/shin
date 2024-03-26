@@ -12,18 +12,47 @@
 [![GitHub Repo stars](https://img.shields.io/github/stars/avan1235/shin?style=social)](https://github.com/avan1235/shin/stargazers)
 [![Fork Shin](https://img.shields.io/github/forks/avan1235/shin?logo=github&style=social)](https://github.com/avan1235/shin/fork)
 
-## Introduction
+## Download and run application
 
-This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop, Server.
+### Download compiled application
 
-* `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - `commonMain` is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
+#### Google Play
 
-* `/iosApp` contains iOS applications. Eventhough we’re sharing UI with Compose Multiplatform,
-  it's needed as an entry point for an iOS app.
+Latest Android version is available on
+[Google Play](https://play.google.com/store/apps/details?id=in.procyk.shin).
 
-* `/server` is for the Ktor server application.
+<a href='https://play.google.com/store/apps/details?id=in.procyk.shin'><img alt='Get it on Google Play' width="300" src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a>
 
-* `/shared` is for the code that will be shared between all targets in the project.
+#### GitHub Releases
+
+You can download compiled version of application from
+[GitHub Releases](https://github.com/avan1235/shin/releases).
+
+You can find the compiled vesion of the application for Android, Linux, macOS and Windows.
+
+Please note that for running unsigned version of macOS application, you need to temporarily
+disable Gatekeeper, so after installing the application run
+
+```shell
+sudo xattr -dr com.apple.quarantine  /Applications/Shin.app
+```
+
+in the terminal. You can learn more about this
+[here](https://web.archive.org/web/20230318124537/https://disable-gatekeeper.github.io/).
+
+To install Linux version run:
+
+```shell
+sudo dpkg -i  shin.deb
+```
+
+### Build application locally
+
+The project is configured with with Gradle and you can find the
+latest release build commands in the [release.yml](./.github/workflows/release.yml) file.
+
+Example build commands for particular platforms:
+- desktop: `./gradlew composeApp:packageDistributionForCurrentOS`
+- Android: `./gradlew composeApp:assembleDebug`
+- iOS: open [iosApp.xcodeproj](./iosApp/iosApp.xcodeproj) in Xcode and run the build
+(you might need to configure the `Team` in `Signing & Capabilities`)
