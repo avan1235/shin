@@ -113,7 +113,7 @@ private data class ShortenedIdentifier(
 
 private fun Shorten.createShortenedIdentifier(): ShortenedIdentifier? {
     val url = url.normalizeUrlCase() ?: return null
-    val prefix = customPrefix?.encodeURLPath(encodeSlash = true, encodeEncoded = false)
+    val prefix = customPrefix?.takeIf { it.isNotEmpty() }?.encodeURLPath(encodeSlash = true, encodeEncoded = false)
     val id = url.sha256().let { uniqueId ->
         prefix?.let { "$it-$uniqueId" } ?: uniqueId
     }
