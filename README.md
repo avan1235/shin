@@ -7,6 +7,7 @@
 [![Build](https://img.shields.io/github/actions/workflow/status/avan1235/shin/release.yml?label=Build&color=green)](https://github.com/avan1235/shin/actions/workflows/release.yml)
 [![Latest Release](https://img.shields.io/github/v/release/avan1235/shin?label=Release&color=green)](https://github.com/avan1235/shin/releases/latest)
 [![Docker](https://img.shields.io/docker/v/avan1235/shin?label=Docker%20Hub&color=green)](https://hub.docker.com/repository/docker/avan1235/shin/tags?ordering=last_updated)
+[![Google Play](https://img.shields.io/endpoint?color=green&logo=google-play&logoColor=green&url=https%3A%2F%2Fplay.cuzi.workers.dev%2Fplay%3Fi%3Din.procyk.shin%26l%3DGoogle%2520Play%26m%3D%24version)](https://play.google.com/store/apps/details?id=in.procyk.shin)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-red.svg)](./LICENSE.md)
 [![GitHub Repo stars](https://img.shields.io/github/stars/avan1235/shin?style=social)](https://github.com/avan1235/shin/stargazers)
