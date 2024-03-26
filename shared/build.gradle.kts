@@ -30,6 +30,11 @@ kotlin {
     jvm()
 
     sourceSets {
+        all {
+            languageSettings.apply {
+                optIn("kotlinx.serialization.ExperimentalSerializationApi")
+            }
+        }
         commonMain.dependencies {
             implementation(libs.ktor.serialization.kotlinx.cbor)
             implementation(libs.ktor.shared.resources)

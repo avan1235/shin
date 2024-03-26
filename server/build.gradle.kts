@@ -14,11 +14,13 @@ application {
 }
 
 kotlin {
-    compilerOptions {
-        optIn = listOf(
-            "kotlinx.coroutines.DelicateCoroutinesApi",
-            "kotlinx.serialization.ExperimentalSerializationApi",
-        )
+    sourceSets {
+        main {
+            languageSettings.apply {
+                optIn("kotlinx.coroutines.DelicateCoroutinesApi")
+                optIn("kotlinx.serialization.ExperimentalSerializationApi")
+            }
+        }
     }
 }
 
