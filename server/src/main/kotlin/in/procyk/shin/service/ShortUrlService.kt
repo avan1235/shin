@@ -122,7 +122,8 @@ private fun Shorten.createShortenedIdentifier(): ShortenedIdentifier? {
         uniqueId = id,
         takeCounts = sequence {
             prefix?.let { yield(it.length) }
-            for (i in 1..id.length) yield((prefix?.let { it.length + 1 } ?: 0) + i)
+            val shift = prefix?.let { it.length + 1 } ?: 0
+            for (i in 1..id.length) yield(shift + i)
         },
     )
 }
