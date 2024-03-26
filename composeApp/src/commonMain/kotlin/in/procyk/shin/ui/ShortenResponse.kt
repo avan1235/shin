@@ -45,7 +45,7 @@ internal fun ShortenResponse(
             ) {
                 QrCode(
                     url = url,
-                    modifier = Modifier.sizeIn(maxWidth = 192.dp, maxHeight = 192.dp),
+                    modifier = Modifier.size(256.dp).aspectRatio(1f),
                 )
                 val color = MaterialTheme.colorScheme.primary
                 val annotatedString = remember(url, color) {
