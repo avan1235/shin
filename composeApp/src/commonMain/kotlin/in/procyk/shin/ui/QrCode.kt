@@ -4,9 +4,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import `in`.procyk.compose.qrcode.QrData
-import `in`.procyk.compose.qrcode.options.*
-import `in`.procyk.compose.qrcode.rememberQrCodePainter
+import io.github.alexzhirkevich.qrose.QrData
+import io.github.alexzhirkevich.qrose.options.*
+import io.github.alexzhirkevich.qrose.rememberQrCodePainter
+import io.github.alexzhirkevich.qrose.text
 
 @Composable
 internal fun QrCode(

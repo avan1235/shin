@@ -92,7 +92,7 @@ kotlin {
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.cbor)
 
-            implementation(libs.procyk.compose.qrcode)
+            implementation(libs.alexzhirkevich.qrose)
             implementation(libs.procyk.compose.calendar)
 
             implementation(libs.decompose)
