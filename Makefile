@@ -1,4 +1,4 @@
-.PHONY: all db server .executable desktop wasm .clean-gradle .clean-docker clean
+.PHONY: all db server .executable desktop wasm lint .clean-gradle .clean-docker clean
 
 all:
 	@# do nothing by default
@@ -19,6 +19,9 @@ desktop: .executable
 
 wasm: .executable
 	./gradlew composeApp:wasmJsBrowserProductionRun
+
+lint: .executable
+	./gradlew detekt
 
 .clean-docker:
 	docker-compose  --file docker-compose.yml --env-file .env down
