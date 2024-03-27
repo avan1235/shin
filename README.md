@@ -52,8 +52,7 @@ sudo dpkg -i  shin.deb
 The project is configured with with Gradle and you can find the
 latest release build commands in the [release.yml](./.github/workflows/release.yml) file.
 
-Example build commands for particular platforms:
-- desktop: `./gradlew composeApp:packageDistributionForCurrentOS`
-- Android: `./gradlew composeApp:assembleDebug`
-- iOS: open [iosApp.xcodeproj](./iosApp/iosApp.xcodeproj) in Xcode and run the build
-(you might need to configure the `Team` in `Signing & Capabilities`)
+How to build particular platforms:
+- Android & iOS: use run configurations provided by [Fleet](https://www.jetbrains.com/fleet/) to run locally
+- desktop: `make desktop`
+- wasm: `make wasm`
