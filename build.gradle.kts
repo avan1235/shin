@@ -15,6 +15,8 @@ plugins {
 }
 
 detekt {
+    toolVersion = libs.versions.detekt.get()
+
     config.setFrom("config/detekt/detekt.yml")
 
     source.setFrom(
