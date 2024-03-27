@@ -10,13 +10,13 @@ db:
 server:
 	docker compose --file docker-compose.yml --env-file .env build
 	docker compose --file docker-compose.yml --env-file .env up
-	
+
 .executable:
 	chmod +X ./gradlew
 
 desktop: .executable
 	./gradlew composeApp:runReleaseDistributable
-	
+
 wasm: .executable
 	./gradlew composeApp:wasmJsBrowserProductionRun
 
