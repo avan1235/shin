@@ -185,7 +185,7 @@ class ShinComponentImpl(
         takeIf { _extraElementsVisible.value && value.value }
 }
 
-private suspend fun HttpClient.requestShortenedUrl(
+private suspend inline fun HttpClient.requestShortenedUrl(
     url: String,
     shortenedProtocol: ShortenedProtocol,
     customPrefix: String?,
@@ -198,7 +198,7 @@ private suspend fun HttpClient.requestShortenedUrl(
         val expirationAt = expirationDate?.plus(1, DateTimeUnit.DAY)
             ?.atStartOfDayIn(TimeZone.currentSystemDefault())
         val shorten = Shorten(shortenedProtocol.buildUrl(url), customPrefix, expirationAt, redirectType)
-        val response = post(SHORTEN_PATH) {
+        val response = post(ShortenPath) {
             contentType(ContentType.Application.Cbor)
             setBody(ShinCbor.encodeToByteArray(shorten))
         }

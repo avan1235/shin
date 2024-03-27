@@ -5,7 +5,7 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.Cbor
 
-const val SHORTEN_PATH: String = "/shorten"
+const val ShortenPath: String = "/shorten"
 
 @Serializable
 enum class RedirectType {

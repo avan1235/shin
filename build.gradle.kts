@@ -15,8 +15,6 @@ plugins {
 }
 
 detekt {
-    buildUponDefaultConfig = true
-
     config.setFrom("config/detekt/detekt.yml")
 
     source.setFrom(

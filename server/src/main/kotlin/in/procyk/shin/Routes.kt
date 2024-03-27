@@ -3,8 +3,8 @@ package `in`.procyk.shin
 import `in`.procyk.shin.service.ShortUrlService
 import `in`.procyk.shin.shared.Decode
 import `in`.procyk.shin.shared.RedirectType
-import `in`.procyk.shin.shared.SHORTEN_PATH
 import `in`.procyk.shin.shared.Shorten
+import `in`.procyk.shin.shared.ShortenPath
 import `in`.procyk.shin.util.env
 import io.github.cdimascio.dotenv.Dotenv
 import io.ktor.http.*
@@ -27,7 +27,7 @@ internal fun Application.installRoutes(): Routing = routing {
     GlobalScope.launch {
         deleteExpiredUrlsEvery(1.hours, service)
     }
-    postBody(SHORTEN_PATH) {
+    postBody(ShortenPath) {
         val shorten = call.receive<Shorten>()
         handleShorten(service, redirectBaseUrl, shorten)
     }

@@ -2,6 +2,7 @@ package `in`.procyk.shin
 
 import javax.swing.SwingUtilities
 
+@Suppress("TooGenericExceptionCaught")
 internal inline fun <T> runOnUiThread(crossinline block: () -> T): T {
     if (SwingUtilities.isEventDispatchThread()) {
         return block()

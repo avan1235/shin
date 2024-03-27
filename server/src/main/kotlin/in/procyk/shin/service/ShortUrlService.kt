@@ -96,7 +96,7 @@ private fun String.normalizeUrlCase(): String? = try {
         uri.fragment,
     )
     normalizedUri.toString()
-} catch (e: URISyntaxException) {
+} catch (_: URISyntaxException) {
     null
 }
 

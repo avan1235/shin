@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.*
@@ -48,30 +49,7 @@ internal fun ShortenResponse(
                     modifier = Modifier.size(256.dp).aspectRatio(1f),
                 )
                 val color = MaterialTheme.colorScheme.primary
-                val annotatedString = remember(url, color) {
-                    buildAnnotatedString {
-                        append(url)
-                        addStyle(
-                            style = SpanStyle(
-                                color = color,
-                                fontSize = 18.sp,
-                            ),
-                            start = 0,
-                            end = url.length,
-                        )
-                        addStyle(
-                            style = ParagraphStyle(textAlign = TextAlign.Center),
-                            start = 0,
-                            end = url.length,
-                        )
-                        addStringAnnotation(
-                            tag = URL_TAG,
-                            annotation = url,
-                            start = 0,
-                            end = url.length
-                        )
-                    }
-                }
+                val annotatedString = remember(url, color) { createUrlAnnotatedString(url, color) }
                 val clipboardManager = LocalClipboardManager.current
                 val localUriHandler = LocalUriHandler.current
                 val interactionSource = remember { MutableInteractionSource() }
@@ -84,7 +62,7 @@ internal fun ShortenResponse(
                     style = if (isHovered) TextStyle(textDecoration = TextDecoration.Underline) else TextStyle.Default,
                     onClick = { position ->
                         annotatedString
-                            .getStringAnnotations(URL_TAG, position, position)
+                            .getStringAnnotations(UrlTag, position, position)
                             .single()
                             .let {
                                 clipboardManager.setText(AnnotatedString(url))
@@ -102,4 +80,27 @@ internal fun ShortenResponse(
     }
 }
 
-private const val URL_TAG: String = "SHORT_URL_TAG"
+private fun createUrlAnnotatedString(url: String, color: Color): AnnotatedString = buildAnnotatedString {
+    append(url)
+    addStyle(
+        style = SpanStyle(
+            color = color,
+            fontSize = 18.sp,
+        ),
+        start = 0,
+        end = url.length,
+    )
+    addStyle(
+        style = ParagraphStyle(textAlign = TextAlign.Center),
+        start = 0,
+        end = url.length,
+    )
+    addStringAnnotation(
+        tag = UrlTag,
+        annotation = url,
+        start = 0,
+        end = url.length
+    )
+}
+
+private const val UrlTag: String = "SHORT_URL_TAG"
