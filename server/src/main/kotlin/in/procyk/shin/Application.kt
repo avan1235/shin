@@ -5,10 +5,9 @@ import `in`.procyk.shin.service.singleShortUrlService
 import `in`.procyk.shin.util.env
 import io.github.cdimascio.dotenv.Dotenv
 import io.github.cdimascio.dotenv.dotenv
-import io.ktor.server.engine.*
 import io.ktor.server.cio.*
+import io.ktor.server.engine.*
 import org.koin.dsl.module
-
 
 fun main() {
     val dotenv = dotenv {

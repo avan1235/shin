@@ -1,10 +1,10 @@
 package `in`.procyk.shin
 
+import `in`.procyk.shin.service.ShortUrlService
 import `in`.procyk.shin.shared.Decode
 import `in`.procyk.shin.shared.RedirectType
 import `in`.procyk.shin.shared.SHORTEN_PATH
 import `in`.procyk.shin.shared.Shorten
-import `in`.procyk.shin.service.ShortUrlService
 import `in`.procyk.shin.util.env
 import io.github.cdimascio.dotenv.Dotenv
 import io.ktor.http.*
@@ -54,8 +54,11 @@ private suspend inline fun PipelineContext<Unit, ApplicationCall>.handleShorten(
     shorten: Shorten,
 ) {
     val shortId = service.findOrCreateShortenedId(shorten)
-    if (shortId != null) call.respond(HttpStatusCode.OK, "$redirectBaseUrl$shortId")
-    else call.respond(HttpStatusCode.BadRequest)
+    if (shortId != null) {
+        call.respond(HttpStatusCode.OK, "$redirectBaseUrl$shortId")
+    } else {
+        call.respond(HttpStatusCode.BadRequest)
+    }
 }
 
 private suspend inline fun PipelineContext<Unit, ApplicationCall>.handleDecode(
@@ -63,8 +66,11 @@ private suspend inline fun PipelineContext<Unit, ApplicationCall>.handleDecode(
     decode: Decode,
 ) {
     val shortened = service.findShortenedUrl(decode.shortenedId)
-    if (shortened != null) call.respondRedirect(shortened.url, permanent = shortened.redirectType.isPermanent)
-    else call.respond(HttpStatusCode.NotFound)
+    if (shortened != null) {
+        call.respondRedirect(shortened.url, permanent = shortened.redirectType.isPermanent)
+    } else {
+        call.respond(HttpStatusCode.NotFound)
+    }
 }
 
 private inline val RedirectType.isPermanent: Boolean

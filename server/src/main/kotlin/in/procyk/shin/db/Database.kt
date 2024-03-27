@@ -21,4 +21,9 @@ object Database {
 }
 
 private val Dotenv.databaseUrl: String
-    get() = "jdbc:postgresql://${env<String>("POSTGRES_HOST")}:${env<String>("POSTGRES_PORT")}/${env<String>("POSTGRES_DB")}"
+    get() {
+        val host = env<String>("POSTGRES_HOST")
+        val port = env<String>("POSTGRES_PORT")
+        val db = env<String>("POSTGRES_DB")
+        return "jdbc:postgresql://$host:$port/$db"
+    }

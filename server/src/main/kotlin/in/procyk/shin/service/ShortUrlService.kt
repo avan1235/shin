@@ -1,9 +1,9 @@
 package `in`.procyk.shin.service
 
-import `in`.procyk.shin.shared.RedirectType
-import `in`.procyk.shin.shared.Shorten
 import `in`.procyk.shin.db.ShortUrl
 import `in`.procyk.shin.db.ShortUrls
+import `in`.procyk.shin.shared.RedirectType
+import `in`.procyk.shin.shared.Shorten
 import io.ktor.http.*
 import kotlinx.datetime.Clock
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.isNotNull

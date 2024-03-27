@@ -31,7 +31,7 @@ private fun Application.installCors(dotenv: Dotenv) {
     val corsHost = dotenv.env<String>("CORS_HOST")
     val corsScheme = dotenv.env<String>("CORS_SCHEME")
     install(CORS) {
-        allowHost("${corsHost}:${corsPort}", schemes = listOf(corsScheme))
+        allowHost("$corsHost:$corsPort", schemes = listOf(corsScheme))
         allowMethod(HttpMethod.Post)
         allowHeader(HttpHeaders.ContentType)
         allowHeader(HttpHeaders.ContentLength)

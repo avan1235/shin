@@ -19,7 +19,6 @@ import kotlinx.datetime.Clock.System.now
 import kotlinx.serialization.encodeToByteArray
 import toLocalDate
 
-
 interface ShinComponent : Component {
 
     val extraElementsVisible: Value<Boolean>

@@ -1,6 +1,5 @@
 package `in`.procyk.shin.ui
 
-import `in`.procyk.shin.shared.RedirectType
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.horizontalScroll
@@ -30,7 +29,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import `in`.procyk.shin.shared.applyIf
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.arkivanov.decompose.value.Value
 import `in`.procyk.compose.calendar.SelectableCalendar
@@ -38,6 +36,8 @@ import `in`.procyk.compose.calendar.rememberSelectableCalendarState
 import `in`.procyk.compose.calendar.year.YearMonth
 import `in`.procyk.shin.component.ShinComponent
 import `in`.procyk.shin.model.ShortenedProtocol
+import `in`.procyk.shin.shared.RedirectType
+import `in`.procyk.shin.shared.applyIf
 
 internal fun LazyListScope.ShortenRequestItems(
     component: ShinComponent,
@@ -187,7 +187,9 @@ private inline fun ExpandableSetting(
     isVertical: Boolean,
     fillMaxWidth: Boolean,
     noinline onVisibleChange: (Boolean) -> Unit,
-    crossinline content: @Composable() () -> Unit,
+    crossinline content:
+    @Composable
+    () -> Unit,
 ) {
     Column(
         modifier = when {
@@ -285,7 +287,9 @@ private fun ShortenRequestElements(
 @Composable
 private inline fun VerticalAnimatedVisibility(
     visible: Boolean,
-    crossinline content: @Composable() AnimatedVisibilityScope.() -> Unit,
+    crossinline content:
+    @Composable()
+    AnimatedVisibilityScope.() -> Unit,
 ) {
     AnimatedVisibility(
         visible = visible,
