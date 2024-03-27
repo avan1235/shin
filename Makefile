@@ -1,4 +1,4 @@
-.PHONY: all db server .executable desktop wasm lint .clean-gradle .clean-docker clean
+.PHONY: all db server .executable server-local desktop wasm lint .clean-gradle .clean-docker clean
 
 all:
 	@# do nothing by default
@@ -13,6 +13,9 @@ server:
 
 .executable:
 	chmod +X ./gradlew
+
+server-local: .executable
+	./gradlew server:run
 
 desktop: .executable
 	./gradlew composeApp:runReleaseDistributable
