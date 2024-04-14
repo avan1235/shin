@@ -29,7 +29,7 @@ dotenvGradle = "4.0.0"
 buildKonfig = "0.15.1"
 graalVM = "0.10.1"
 # @keep
-versionCode = "5"
+versionCode = "6"
 
 [libraries]
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
