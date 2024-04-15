@@ -4,11 +4,11 @@ import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.arkivanov.essenty.lifecycle.resume
 import `in`.procyk.shin.ShinApp
 import `in`.procyk.shin.component.ShinAppComponentContext
-import `in`.procyk.shin.component.ShinComponentImpl
+import `in`.procyk.shin.component.ShinAppComponentImpl
 
 fun main() {
     val lifecycle = LifecycleRegistry()
-    val component = ShinComponentImpl(
+    val component = ShinAppComponentImpl(
         ShinAppComponentContext(),
         DefaultComponentContext(lifecycle)
     )

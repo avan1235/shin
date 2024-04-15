@@ -57,13 +57,13 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 private class RootHolder {
     let lifecycle: LifecycleRegistry
     let stateKeeper: StateKeeperDispatcher
-    let root: ShinComponent
+    let root: ShinAppComponent
 
     init(savedState: SerializableContainer?) {
         lifecycle = LifecycleRegistryKt.LifecycleRegistry()
         stateKeeper = StateKeeperDispatcherKt.StateKeeperDispatcher(savedState: savedState)
 
-        root = ShinComponentImpl(
+        root = ShinAppComponentImpl(
             appContext: ShinAppComponentContext(),
             componentContext: DefaultComponentContext(
                 lifecycle: lifecycle,

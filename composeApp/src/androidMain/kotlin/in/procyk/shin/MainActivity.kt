@@ -5,13 +5,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.arkivanov.decompose.defaultComponentContext
 import `in`.procyk.shin.component.ShinAppComponentContext
-import `in`.procyk.shin.component.ShinComponentImpl
+import `in`.procyk.shin.component.ShinAppComponentImpl
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val appContext = ShinAppComponentContext()
-        val component = ShinComponentImpl(appContext, defaultComponentContext())
+        val component = ShinAppComponentImpl(appContext, defaultComponentContext())
         setContent {
             ShinApp(component)
         }

@@ -85,6 +85,7 @@ kotlin {
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.ui)
+            implementation(compose.materialIconsExtended)
             implementation(compose.components.resources)
             implementation(projects.shared)
 
@@ -94,6 +95,9 @@ kotlin {
 
             implementation(libs.alexzhirkevich.qrose)
             implementation(libs.procyk.compose.calendar)
+            implementation(libs.procyk.compose.camera.qr)
+            implementation(libs.procyk.compose.camera.permission)
+            implementation(libs.procyk.compose.util)
 
             implementation(libs.decompose)
             implementation(libs.decompose.extensionsComposeJetbrains)
@@ -178,7 +182,14 @@ compose {
                 bundleID = "in.procyk.shin"
                 appStore = false
                 signing {
-                    sign.set(false)
+                    sign = false
+                }
+                runtimeEntitlementsFile.set(project.file("runtime-entitlements.plist"))
+                infoPlist {
+                    extraKeysRawXml = """
+                        <key>NSCameraUsageDescription</key>
+                        <string></string>
+                    """.trimIndent()
                 }
             }
         }

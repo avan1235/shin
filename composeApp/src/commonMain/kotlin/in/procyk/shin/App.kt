@@ -1,79 +1,38 @@
 package `in`.procyk.shin
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.key.*
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.arkivanov.decompose.extensions.compose.subscribeAsState
-import `in`.procyk.shin.component.ShinComponent
-import `in`.procyk.shin.shared.applyIf
-import `in`.procyk.shin.shared.toNullable
-import `in`.procyk.shin.ui.ShortenRequestItems
-import `in`.procyk.shin.ui.ShortenResponse
+import com.arkivanov.decompose.extensions.compose.stack.Children
+import com.arkivanov.decompose.extensions.compose.stack.animation.slide
+import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
+import `in`.procyk.compose.camera.permission.rememberCameraPermissionState
+import `in`.procyk.shin.component.ShinAppComponent
+import `in`.procyk.shin.component.ShinAppComponent.Child
+import `in`.procyk.shin.ui.screen.MainScreen
+import `in`.procyk.shin.ui.screen.ScanQRCodeScreen
 import `in`.procyk.shin.ui.theme.ShinTheme
-import org.jetbrains.compose.resources.Font
-import shin.composeapp.generated.resources.Mansalva_Regular
-import shin.composeapp.generated.resources.Res
 
 @Composable
-fun ShinApp(component: ShinComponent) {
+fun ShinApp(component: ShinAppComponent) {
+    val permission = rememberCameraPermissionState()
     ShinTheme {
-        Scaffold(
-            snackbarHost = { SnackbarHost(component.snackbarHostState) },
+        Children(
+            stack = component.stack,
             modifier = Modifier.fillMaxSize(),
-        ) {
-            BoxWithConstraints(
+            animation = stackAnimation(slide())
+        ) { child ->
+            Scaffold(
+                snackbarHost = { SnackbarHost(component.snackbarHostState) },
                 modifier = Modifier.fillMaxSize(),
             ) {
-                val isVertical = maxHeight > maxWidth
-                val maxWidth = maxWidth
-
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .applyIf(isVertical) { padding(horizontal = 16.dp) }
-                        .onKeyEvent { event -> event.isEscDown.also { if (it) component.onShortenedUrlReset() } },
-                    verticalArrangement = Arrangement.spacedBy(16.dp, alignment = Alignment.CenterVertically),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    contentPadding = PaddingValues(vertical = 16.dp)
-                ) {
-                    item {
-                        Text(
-                            text = "Shin",
-                            fontFamily = FontFamily(Font(Res.font.Mansalva_Regular)),
-                            style = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.primary),
-                            fontSize = 64.sp,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                        Text(
-                            text = "Shorten Your URL with Kotlin",
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
-                    item {
-                        val shortenedUrl by component.shortenedUrl.subscribeAsState()
-                        ShortenResponse(shortenedUrl.toNullable())
-                    }
-                    ShortenRequestItems(
-                        component = component,
-                        maxWidth = maxWidth,
-                        isVertical = isVertical,
-                    )
+                when (val instance = child.instance) {
+                    is Child.Main -> MainScreen(instance.component, permission.isAvailable)
+                    is Child.ScanQRCode -> ScanQRCodeScreen(instance.component, permission)
                 }
             }
         }
     }
 }
-
-private val KeyEvent.isEscDown: Boolean
-    get() = key == Key.Escape && type == KeyEventType.KeyDown

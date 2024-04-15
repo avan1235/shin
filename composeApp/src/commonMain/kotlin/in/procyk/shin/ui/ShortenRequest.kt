@@ -11,6 +11,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.QrCode
+import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,6 +24,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -34,15 +37,16 @@ import com.arkivanov.decompose.value.Value
 import `in`.procyk.compose.calendar.SelectableCalendar
 import `in`.procyk.compose.calendar.rememberSelectableCalendarState
 import `in`.procyk.compose.calendar.year.YearMonth
-import `in`.procyk.shin.component.ShinComponent
+import `in`.procyk.shin.component.MainComponent
 import `in`.procyk.shin.model.ShortenedProtocol
 import `in`.procyk.shin.shared.RedirectType
 import `in`.procyk.shin.shared.applyIf
 
 internal fun LazyListScope.ShortenRequestItems(
-    component: ShinComponent,
+    component: MainComponent,
     maxWidth: Dp,
     isVertical: Boolean,
+    isCameraAvailable: Boolean,
     space: Dp = 8.dp,
 ) {
     item {
@@ -58,6 +62,7 @@ internal fun LazyListScope.ShortenRequestItems(
                 ShortenRequestElements(
                     component = component,
                     fillMaxWidth = true,
+                    isCameraAvailable = isCameraAvailable,
                     maxTextFieldWidth = maxWidth / 2,
                 )
             }
@@ -73,6 +78,7 @@ internal fun LazyListScope.ShortenRequestItems(
                 ShortenRequestElements(
                     component = component,
                     fillMaxWidth = false,
+                    isCameraAvailable = isCameraAvailable,
                     maxTextFieldWidth = maxWidth / 2,
                 )
             }
@@ -85,7 +91,7 @@ internal fun LazyListScope.ShortenRequestItems(
 
 @Composable
 private fun ShortenRequestExtraElements(
-    component: ShinComponent,
+    component: MainComponent,
     isVertical: Boolean,
 ) {
     val extraElementsVisible by component.extraElementsVisible.subscribeAsState()
@@ -123,7 +129,7 @@ private fun ShortenRequestExtraElements(
 
 @Composable
 private fun ExpandableSettings(
-    component: ShinComponent,
+    component: MainComponent,
     isVertical: Boolean,
 ) {
     ExpandableSetting(
@@ -189,7 +195,7 @@ private inline fun ExpandableSetting(
     noinline onVisibleChange: (Boolean) -> Unit,
     crossinline content:
     @Composable
-    () -> Unit,
+        () -> Unit,
 ) {
     Column(
         modifier = when {
@@ -229,8 +235,9 @@ private inline fun ExpandableSetting(
 
 @Composable
 private fun ShortenRequestElements(
-    component: ShinComponent,
+    component: MainComponent,
     fillMaxWidth: Boolean,
+    isCameraAvailable: Boolean,
     maxTextFieldWidth: Dp,
 ) {
     val url by component.url.subscribeAsState()
@@ -246,39 +253,53 @@ private fun ShortenRequestElements(
     )
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
-    ShinTextField(
-        value = url,
-        onValueChange = component::onUrlChange,
-        label = "URL",
-        modifier = Modifier
-            .focusRequester(focusRequester)
+    Row(
+        modifier = (Modifier as Modifier)
             .applyIf(fillMaxWidth) { fillMaxWidth() }
             .applyIf(!fillMaxWidth) { widthIn(max = maxTextFieldWidth) },
-        keyboardOptions = KeyboardOptions(
-            capitalization = KeyboardCapitalization.None,
-            autoCorrect = false,
-            keyboardType = KeyboardType.Uri,
-            imeAction = ImeAction.Done,
-        ),
-        keyboardActions = KeyboardActions(
-            onDone = {
-                component.onShorten()
-                keyboardController?.hide()
-            },
-        ),
-    )
-    Button(
-        modifier = Modifier
-            .height(56.dp)
-            .applyIf(fillMaxWidth) { fillMaxWidth() },
-        shape = RoundedCornerShape(12.dp),
-        onClick = component::onShorten,
+        verticalAlignment = Alignment.Bottom,
+        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
     ) {
-        Text(
-            text = "Shorten",
-            fontSize = 18.sp,
+        ShinTextField(
+            value = url,
+            onValueChange = component::onUrlChange,
+            label = "URL",
+            modifier = Modifier
+                .weight(1f)
+                .focusRequester(focusRequester),
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.None,
+                autoCorrect = false,
+                keyboardType = KeyboardType.Uri,
+                imeAction = ImeAction.Done,
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    component.onShorten()
+                    keyboardController?.hide()
+                },
+            ),
         )
+        if (isCameraAvailable) {
+            FilledTonalIconButton(
+                modifier = Modifier.size(56.dp),
+                onClick = component::onScanQRCode,
+                shape = RoundedCornerShape(12.dp),
+                enabled = true,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.QrCodeScanner,
+                    contentDescription = "Scan QR Code",
+                    modifier = Modifier.size(36.dp)
+                )
+            }
+        }
     }
+    ShinTextButton(
+        text = "Shorten",
+        fillMaxWidth = fillMaxWidth,
+        onClick = component::onShorten,
+    )
     LaunchedEffect(focusRequester) {
         focusRequester.requestFocus()
     }

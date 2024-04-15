@@ -19,7 +19,7 @@ kotlinxDatetime = "0.6.0-RC.2"
 kotlinxCoroutines = "1.8.0"
 kotlinxSerialization = "1.6.3"
 qrose = "1.0.1"
-procyk-compose = "1.6.2.0"
+procyk-compose = "1.6.2.1"
 logback = "1.5.3"
 postgres = "42.7.1"
 dotenv = "6.4.1"
@@ -61,6 +61,9 @@ kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 alexzhirkevich-qrose = { module = "io.github.alexzhirkevich:qrose", version.ref = "qrose" }
 procyk-compose-calendar = { module = "in.procyk.compose:calendar", version.ref = "procyk-compose" }
+procyk-compose-camera-qr = { module = "in.procyk.compose:camera-qr", version.ref = "procyk-compose" }
+procyk-compose-camera-permission = { module = "in.procyk.compose:camera-permission", version.ref = "procyk-compose" }
+procyk-compose-util = { module = "in.procyk.compose:util", version.ref = "procyk-compose" }
 postgres = { module = "org.postgresql:postgresql", version.ref = "postgres" }
 dotenv = { module = "io.github.cdimascio:dotenv-kotlin", version.ref = "dotenv" }
 decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }

@@ -19,7 +19,7 @@ import kotlinx.datetime.Clock.System.now
 import kotlinx.serialization.encodeToByteArray
 import toLocalDate
 
-interface ShinComponent : Component {
+interface MainComponent : Component {
 
     val extraElementsVisible: Value<Boolean>
 
@@ -61,13 +61,16 @@ interface ShinComponent : Component {
 
     fun onShortenedUrlReset()
 
+    fun onScanQRCode()
+
     fun onShorten()
 }
 
-class ShinComponentImpl(
+class MainComponentImpl(
     appContext: ShinAppComponentContext,
     componentContext: ComponentContext,
-) : AbstractComponent(appContext, componentContext), ShinComponent {
+    private val navigateOnScanQRCode: () -> Unit,
+) : AbstractComponent(appContext, componentContext), MainComponent {
 
     private val httpClient: HttpClient = createHttpClient()
 
@@ -153,6 +156,10 @@ class ShinComponentImpl(
     override fun onShortenedUrlReset() {
         _shortenedUrl.update { None }
         _extraElementsVisible.update { false }
+    }
+
+    override fun onScanQRCode() {
+        navigateOnScanQRCode()
     }
 
     override fun onShorten() {

@@ -4,7 +4,7 @@ import ComposeApp
 
 struct ComposeView: UIViewControllerRepresentable {
 
-    let component: ShinComponent
+    let component: ShinAppComponent
 
     func makeUIViewController(context: Context) -> UIViewController {
         MainViewControllerKt.MainViewController(component: component)
@@ -16,7 +16,7 @@ struct ComposeView: UIViewControllerRepresentable {
 
 struct ContentView: View {
 
-    let component: ShinComponent
+    let component: ShinAppComponent
 
     var body: some View {
         ComposeView(component: component)

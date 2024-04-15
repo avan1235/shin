@@ -11,13 +11,13 @@ import com.arkivanov.decompose.extensions.compose.lifecycle.LifecycleController
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import `in`.procyk.shin.ShinApp
 import `in`.procyk.shin.component.ShinAppComponentContext
-import `in`.procyk.shin.component.ShinComponentImpl
+import `in`.procyk.shin.component.ShinAppComponentImpl
 import `in`.procyk.shin.runOnUiThread
 
 fun main() {
     val lifecycle = LifecycleRegistry()
     val component = runOnUiThread {
-        ShinComponentImpl(
+        ShinAppComponentImpl(
             ShinAppComponentContext(),
             DefaultComponentContext(lifecycle)
         )
