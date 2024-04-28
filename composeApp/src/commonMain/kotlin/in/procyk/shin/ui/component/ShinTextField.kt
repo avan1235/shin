@@ -1,4 +1,4 @@
-package `in`.procyk.shin.ui
+package `in`.procyk.shin.ui.component
 
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-@Suppress("NOTHING_TO_INLINE")
 @Composable
 internal inline fun ShinTextField(
     value: String,

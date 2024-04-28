@@ -1,5 +1,6 @@
-package `in`.procyk.shin
+package `in`.procyk.shin.ui.util
 
+import `in`.procyk.shin.ComposeAppConfig
 import `in`.procyk.shin.shared.ShinCbor
 import io.ktor.client.*
 import io.ktor.client.plugins.*

@@ -8,6 +8,7 @@ import com.arkivanov.essenty.lifecycle.Lifecycle
 import `in`.procyk.shin.ui.util.coroutineScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -108,4 +109,10 @@ abstract class AbstractComponent(
         lifecycle: Lifecycle = this@AbstractComponent.lifecycle,
         context: CoroutineContext = Dispatchers.Main.immediate,
     ): Value<T> = asValueUtil(lifecycle, context)
+
+    protected fun <T : Any> Flow<T>.asValue(
+        initialValue: T,
+        lifecycle: Lifecycle = this@AbstractComponent.lifecycle,
+        context: CoroutineContext = Dispatchers.Main.immediate,
+    ): Value<T> = asValueUtil(initialValue, lifecycle, context)
 }

@@ -1,8 +1,9 @@
 package `in`.procyk.shin.component
 
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.childContext
 import com.arkivanov.decompose.value.Value
-import `in`.procyk.shin.createHttpClient
+import `in`.procyk.shin.ui.util.createHttpClient
 import `in`.procyk.shin.model.ShortenedProtocol
 import `in`.procyk.shin.shared.*
 import `in`.procyk.shin.shared.Option.None
@@ -21,6 +22,8 @@ import toLocalDate
 
 interface MainComponent : Component {
 
+    val favourites: FavouritesComponent
+
     val extraElementsVisible: Value<Boolean>
 
     val customPrefix: Value<String>
@@ -35,7 +38,7 @@ interface MainComponent : Component {
 
     val redirectTypeVisible: Value<Boolean>
 
-    val url: Value<String>
+    val fullUrl: Value<String>
 
     val shortenedUrl: Value<Option<String>>
 
@@ -74,6 +77,8 @@ class MainComponentImpl(
 
     private val httpClient: HttpClient = createHttpClient()
 
+    override val favourites: FavouritesComponent = FavouritesComponentImpl(appContext, componentContext.childContext(key = "Favourites"))
+
     private val _extraElementsVisible = MutableStateFlow(false)
     override val extraElementsVisible: Value<Boolean> = _extraElementsVisible.asValue()
 
@@ -96,7 +101,7 @@ class MainComponentImpl(
     override val redirectTypeVisible: Value<Boolean> = _redirectTypeVisible.asValue()
 
     private val _url = MutableStateFlow("")
-    override val url: Value<String> = _url.asValue()
+    override val fullUrl: Value<String> = _url.asValue()
 
     private val _shortenedUrl = MutableStateFlow<Option<String>>(None)
     override val shortenedUrl: Value<Option<String>> = _shortenedUrl.asValue()

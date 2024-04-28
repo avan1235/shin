@@ -1,4 +1,4 @@
-package `in`.procyk.shin.ui
+package `in`.procyk.shin.ui.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable

@@ -25,7 +25,6 @@ kotlin {
             }
         }
         binaries.executable()
-        applyBinaryen()
     }
 
     androidTarget {
@@ -105,6 +104,10 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.kotlinx.serialization.core)
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.kotlinx.coroutines.core)
+
+            implementation(libs.multiplatform.settings)
+            implementation(libs.multiplatform.settings.no.arg)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

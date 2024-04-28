@@ -3,18 +3,32 @@ package `in`.procyk.shin.component
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.*
 import com.arkivanov.decompose.value.Value
+import com.arkivanov.decompose.value.operator.map
 import `in`.procyk.shin.component.ShinAppComponent.Child
+import `in`.procyk.shin.component.ShinAppComponent.MenuItem
 import kotlinx.serialization.Serializable
 
 interface ShinAppComponent : Component {
 
     val stack: Value<ChildStack<*, Child>>
 
+    val activeMenuItem: Value<MenuItem>
+
     fun onBackClicked(toIndex: Int)
+
+    fun navigateTo(item: MenuItem)
+
+    enum class MenuItem {
+        Main,
+        ScanQRCode,
+        Favourites,
+        ;
+    }
 
     sealed class Child {
         class Main(val component: MainComponent) : Child()
         class ScanQRCode(val component: ScanQRCodeComponent) : Child()
+        class Favourites(val component: FavouritesComponent) : Child()
     }
 }
 
@@ -32,12 +46,20 @@ class ShinAppComponentImpl(
         childFactory = ::child,
     )
 
+    override val activeMenuItem: Value<MenuItem> = stack.map {
+        when (it.active.instance) {
+            is Child.Favourites -> MenuItem.Favourites
+            is Child.Main -> MenuItem.Main
+            is Child.ScanQRCode -> MenuItem.ScanQRCode
+        }
+    }
+
     private fun child(config: Config, childComponentContext: ComponentContext): Child = when (config) {
         is Config.Main -> Child.Main(
             MainComponentImpl(
                 appContext = appContext,
                 componentContext = childComponentContext,
-                navigateOnScanQRCode = { navigation.push(Config.ScanQRCode) },
+                navigateOnScanQRCode = { navigateTo(MenuItem.ScanQRCode) },
             )
         )
 
@@ -52,11 +74,26 @@ class ShinAppComponentImpl(
                 },
             )
         )
+
+        is Config.Favourites -> Child.Favourites(
+            FavouritesComponentImpl(
+                appContext = appContext,
+                componentContext = childComponentContext
+            )
+        )
     }
 
 
     override fun onBackClicked(toIndex: Int) {
         navigation.popTo(index = toIndex)
+    }
+
+    override fun navigateTo(item: MenuItem) {
+        when (item) {
+            MenuItem.Main -> navigation.popTo(index = 0)
+            MenuItem.ScanQRCode -> Config.ScanQRCode.let(navigation::pushToFront)
+            MenuItem.Favourites -> Config.Favourites.let(navigation::pushToFront)
+        }
     }
 
     @Serializable
@@ -66,5 +103,8 @@ class ShinAppComponentImpl(
 
         @Serializable
         data object ScanQRCode : Config
+
+        @Serializable
+        data object Favourites : Config
     }
 }

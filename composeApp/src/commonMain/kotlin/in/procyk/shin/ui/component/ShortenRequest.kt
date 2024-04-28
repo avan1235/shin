@@ -1,4 +1,4 @@
-package `in`.procyk.shin.ui
+package `in`.procyk.shin.ui.component
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
@@ -11,7 +11,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.QrCode
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -24,7 +23,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -240,7 +238,7 @@ private fun ShortenRequestElements(
     isCameraAvailable: Boolean,
     maxTextFieldWidth: Dp,
 ) {
-    val url by component.url.subscribeAsState()
+    val url by component.fullUrl.subscribeAsState()
     val protocol by component.protocol.subscribeAsState()
 
     EnumChooser(
