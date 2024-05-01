@@ -47,7 +47,7 @@ fun ShinApp(component: ShinAppComponent) {
             modifier = Modifier.fillMaxSize(),
             animation = stackAnimation(slide(orientation = Orientation.Vertical))
         ) { child ->
-            NavigationDrawer(component) {
+            NavigationDrawer(component, permission.isAvailable) {
                 when (val instance = child.instance) {
                     is Child.Main -> MainScreen(instance.component, permission.isAvailable)
                     is Child.ScanQRCode -> ScanQRCodeScreen(instance.component, permission)
@@ -61,6 +61,7 @@ fun ShinApp(component: ShinAppComponent) {
 @Composable
 private inline fun NavigationDrawer(
     component: ShinAppComponent,
+    isCameraAvailable: Boolean,
     crossinline content: @Composable BoxScope.() -> Unit,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -87,7 +88,10 @@ private inline fun NavigationDrawer(
                 }
                 Spacer(modifier = Modifier.height(24.dp))
 
-                MenuItem.entries.forEach { item ->
+                listOfNotNull(
+                    MenuItem.Main,
+                    MenuItem.ScanQRCode.takeIf { isCameraAvailable },
+                ).forEach { item ->
                     NavigationDrawerItem(
                         icon = {
                             Icon(
