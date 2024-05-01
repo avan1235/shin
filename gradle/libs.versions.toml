@@ -8,10 +8,10 @@ android-minSdk = "26"
 android-targetSdk = "34"
 androidx-activityCompose = "1.8.2"
 detekt = "1.23.6"
-jetbrains-compose = "1.6.2"
+jetbrains-compose = "1.6.10-beta03"
 exposed = "0.47.0"
 # @pin
-kotlin = "2.0.0-RC1"
+kotlin = "2.0.0-RC2"
 ktor-server = "2.3.9"
 ktor-client = "3.0.0-wasm2"
 koin = "3.6.0-wasm-alpha2"
@@ -19,7 +19,7 @@ kotlinxDatetime = "0.6.0-RC.2"
 kotlinxCoroutines = "1.8.0"
 kotlinxSerialization = "1.6.3"
 qrose = "1.0.1"
-procyk-compose = "1.6.2.1"
+procyk-compose = "1.6.10-beta03.0"
 multiplatform-settings = "1.1.1"
 logback = "1.5.3"
 postgres = "42.7.1"
@@ -81,6 +81,7 @@ androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "jetbrains-compose" }
+composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor-server" }
