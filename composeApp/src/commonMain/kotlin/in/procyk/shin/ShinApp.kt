@@ -1,5 +1,6 @@
 package `in`.procyk.shin
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -47,7 +48,7 @@ fun ShinApp(component: ShinAppComponent) {
             modifier = Modifier.fillMaxSize(),
             animation = stackAnimation(slide(orientation = Orientation.Vertical))
         ) { child ->
-            NavigationDrawer(component, permission.isAvailable) {
+            NavigationDrawer(component, permission.isAvailable, child.instance.showTopMenu) {
                 when (val instance = child.instance) {
                     is Child.Main -> MainScreen(instance.component, permission.isAvailable)
                     is Child.ScanQRCode -> ScanQRCodeScreen(instance.component, permission)
@@ -62,6 +63,7 @@ fun ShinApp(component: ShinAppComponent) {
 private inline fun NavigationDrawer(
     component: ShinAppComponent,
     isCameraAvailable: Boolean,
+    showTopMenu: Boolean,
     crossinline content: @Composable BoxScope.() -> Unit,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -91,26 +93,14 @@ private inline fun NavigationDrawer(
                 listOfNotNull(
                     MenuItem.Main,
                     MenuItem.ScanQRCode.takeIf { isCameraAvailable },
+                    MenuItem.Favourites,
                 ).forEach { item ->
                     NavigationDrawerItem(
                         icon = {
-                            Icon(
-                                when (item) {
-                                    MenuItem.Main -> Icons.Outlined.Home
-                                    MenuItem.ScanQRCode -> Icons.Outlined.QrCodeScanner
-                                    MenuItem.Favourites -> Icons.Outlined.Favorite
-                                },
-                                contentDescription = "Menu item icon"
-                            )
+                            Icon(item.icon, contentDescription = "Menu item icon")
                         },
                         label = {
-                            Text(
-                                when (item) {
-                                    MenuItem.Main -> "Home"
-                                    MenuItem.ScanQRCode -> "Scan QR Code"
-                                    MenuItem.Favourites -> "Favourites"
-                                }
-                            )
+                            Text(item.presentableName)
                         },
                         selected = item == activeMenuItem,
                         onClick = {
@@ -147,31 +137,44 @@ private inline fun NavigationDrawer(
         Scaffold(
             snackbarHost = { SnackbarHost(component.snackbarHostState) },
             modifier = Modifier.fillMaxSize(),
-        ) { contentPadding ->
-            Box(
-                modifier = Modifier.fillMaxSize().padding(contentPadding),
-                content = content,
-            )
-            Box(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                IconButton(
-                    modifier = Modifier.align(Alignment.TopStart),
-                    onClick = {
-                        scope.launch {
-                            drawerState.run {
-                                if (isClosed) {
-                                    keyboardController?.hide()
-                                    open()
-                                } else {
-                                    close()
+        ) {
+            if (showTopMenu) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 48.dp),
+                    content = content,
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .background(MaterialTheme.colorScheme.primaryContainer)
+                ) {
+                    IconButton(
+                        modifier = Modifier.align(Alignment.CenterStart),
+                        onClick = {
+                            scope.launch {
+                                drawerState.run {
+                                    if (isClosed) {
+                                        keyboardController?.hide()
+                                        open()
+                                    } else {
+                                        close()
+                                    }
                                 }
                             }
                         }
+                    ) {
+                        Icon(Icons.Default.Menu, contentDescription = "Menu")
                     }
-                ) {
-                    Icon(Icons.Default.Menu, contentDescription = "Menu")
                 }
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    content = content,
+                )
             }
         }
     }
@@ -188,3 +191,17 @@ private inline fun FindMeOn(
         Icon(icon, "Find me on $name")
     }
 }
+
+private inline val MenuItem.icon: ImageVector
+    get() = when (this) {
+        MenuItem.Main -> Icons.Outlined.Home
+        MenuItem.ScanQRCode -> Icons.Outlined.QrCodeScanner
+        MenuItem.Favourites -> Icons.Outlined.Favorite
+    }
+
+private inline val MenuItem.presentableName: String
+    get() = when (this) {
+        MenuItem.Main -> "Home"
+        MenuItem.ScanQRCode -> "Scan QR Code"
+        MenuItem.Favourites -> "Favourites"
+    }

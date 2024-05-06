@@ -100,8 +100,8 @@ class MainComponentImpl(
     private val _redirectTypeVisible = MutableStateFlow(false)
     override val redirectTypeVisible: Value<Boolean> = _redirectTypeVisible.asValue()
 
-    private val _url = MutableStateFlow("")
-    override val fullUrl: Value<String> = _url.asValue()
+    private val _fullUrl = MutableStateFlow("")
+    override val fullUrl: Value<String> = _fullUrl.asValue()
 
     private val _shortenedUrl = MutableStateFlow<Option<String>>(None)
     override val shortenedUrl: Value<Option<String>> = _shortenedUrl.asValue()
@@ -151,7 +151,7 @@ class MainComponentImpl(
     override fun onUrlChange(url: String) {
         val (updatedUrl, updatedProtocol) = ShortenedProtocol.simplifyInputUrl(url)
         updatedProtocol?.let { protocol -> _protocol.update { protocol } }
-        _url.update { updatedUrl }
+        _fullUrl.update { updatedUrl }
     }
 
     override fun onProtocolChange(protocol: ShortenedProtocol) {
@@ -170,7 +170,7 @@ class MainComponentImpl(
     override fun onShorten() {
         scope.launch {
             httpClient.requestShortenedUrl(
-                url = _url.value,
+                url = _fullUrl.value,
                 shortenedProtocol = _protocol.value,
                 customPrefix = _customPrefix.value.takeIfExtraElementsVisibleAnd(customPrefixVisible),
                 expirationDate = _expirationDate.value.takeIfExtraElementsVisibleAnd(expirationDateVisible),

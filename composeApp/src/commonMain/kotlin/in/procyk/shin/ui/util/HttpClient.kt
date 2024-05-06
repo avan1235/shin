@@ -12,6 +12,7 @@ internal fun createHttpClient(): HttpClient = HttpClient {
     install(ContentNegotiation) {
         cbor(ShinCbor)
     }
+    followRedirects = false
     defaultRequest {
         host = ComposeAppConfig.CLIENT_HOST
         url {

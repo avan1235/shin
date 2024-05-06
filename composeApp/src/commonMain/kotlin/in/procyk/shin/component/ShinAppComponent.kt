@@ -25,10 +25,10 @@ interface ShinAppComponent : Component {
         ;
     }
 
-    sealed class Child {
-        class Main(val component: MainComponent) : Child()
-        class ScanQRCode(val component: ScanQRCodeComponent) : Child()
-        class Favourites(val component: FavouritesComponent) : Child()
+    sealed class Child(val showTopMenu: Boolean) {
+        class Main(val component: MainComponent) : Child(showTopMenu = true)
+        class ScanQRCode(val component: ScanQRCodeComponent) : Child(showTopMenu = false)
+        class Favourites(val component: FavouritesComponent) : Child(showTopMenu = true)
     }
 }
 

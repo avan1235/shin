@@ -1,10 +1,16 @@
 package `in`.procyk.shin.component
 
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.decompose.value.operator.map
 import com.russhwolf.settings.ObservableSettings
 import com.russhwolf.settings.Settings
+import `in`.procyk.shin.ui.util.createHttpClient
+import io.ktor.client.*
+import io.ktor.client.request.*
+import io.ktor.http.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.callbackFlow
@@ -21,11 +27,13 @@ interface FavouritesComponent : Component {
 
     val favourites: Value<List<Favourite>>
 
-    fun overwriteFavourite(fullUrl: String, shortUrl: String)
+    fun onFavouriteClick(clipboardManager: ClipboardManager, shortUrl: String)
 
-    fun deleteFavourite(fullUrl: String)
+    fun overwriteFavourite(shortUrl: String)
 
-    fun isFavourite(fullUrl: String, shortUrl: String): Value<Boolean>
+    fun removeFavourite(shortUrl: String)
+
+    fun isFavourite(shortUrl: String): Value<Boolean>
 }
 
 @Serializable
@@ -40,9 +48,11 @@ class FavouritesComponentImpl(
     componentContext: ComponentContext,
 ) : AbstractComponent(appContext, componentContext), FavouritesComponent {
 
+    private val httpClient: HttpClient = createHttpClient()
+
     private val settings = Settings()
 
-    private val _favourites = callbackFlow {
+    private val _favourites: Value<MutableMap<String, Favourite>> = callbackFlow {
         if (settings is ObservableSettings) {
             settings.addStringOrNullListener(FAVOURITES_KEY) {
                 trySend(settings.loadFavourites())
@@ -60,21 +70,34 @@ class FavouritesComponentImpl(
     override val favourites: Value<List<Favourite>> =
         _favourites.map { it.map { it.value } }
 
-    override fun overwriteFavourite(fullUrl: String, shortUrl: String) {
+    override fun onFavouriteClick(clipboardManager: ClipboardManager, shortUrl: String) {
+        toast("Copied '$shortUrl' to clipboard")
+        clipboardManager.setText(AnnotatedString(shortUrl))
+    }
+
+    override fun overwriteFavourite(shortUrl: String) {
+        findResolvedUrl(shortUrl) { fullUrl ->
+            val new = Favourite(fullUrl ?: return@findResolvedUrl, shortUrl, createdAt = Clock.System.now())
+            val favourites = _favourites.value
+            favourites[shortUrl] = new
+            settings.saveFavourites(favourites)
+        }
+    }
+
+    override fun removeFavourite(shortUrl: String) {
         val favourites = _favourites.value
-        val new = Favourite(fullUrl, shortUrl, createdAt = Clock.System.now())
-        favourites[new.fullUrl] = new
+        favourites.remove(shortUrl)
         settings.saveFavourites(favourites)
     }
 
-    override fun deleteFavourite(fullUrl: String) {
-        val favourites = _favourites.value
-        favourites.remove(fullUrl)
-        settings.saveFavourites(favourites)
+    override fun isFavourite(shortUrl: String): Value<Boolean> {
+        return _favourites.map { it[shortUrl] != null }
     }
 
-    override fun isFavourite(fullUrl: String, shortUrl: String): Value<Boolean> {
-        return _favourites.map { it[fullUrl]?.shortUrl == shortUrl }
+    private inline fun findResolvedUrl(shortUrl: String, crossinline onResolved: (fullUrl: String?) -> Unit) {
+        scope.launch {
+            onResolved(httpClient.requestFullUrl(shortUrl))
+        }
     }
 }
 
@@ -93,3 +116,12 @@ private fun Settings.saveFavourites(favourites: Map<String, Favourite>) {
     val encoded = FavouritesJson.encodeToString(favourites)
     putString(FAVOURITES_KEY, encoded)
 }
+
+private suspend fun HttpClient.requestFullUrl(shortUrl: String): String? {
+    val response = get(shortUrl)
+    if (response.status !in REDIRECT_STATUS_CODES) return null
+    
+    return response.call.response.headers[HttpHeaders.Location]
+}
+
+private val REDIRECT_STATUS_CODES: Set<HttpStatusCode> = setOf(HttpStatusCode.MovedPermanently, HttpStatusCode.Found)

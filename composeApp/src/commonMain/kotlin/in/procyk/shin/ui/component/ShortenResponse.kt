@@ -12,7 +12,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.outlined.StarOutline
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconToggleButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -77,13 +80,13 @@ internal fun ShortenResponse(
                     }
                 )
                 Row {
-                    val checked by component.favourites.isFavourite(fullUrl, url).subscribeAsState()
+                    val checked by component.favourites.isFavourite(url).subscribeAsState()
                     IconToggleButton(
                         checked = checked,
                         onCheckedChange = {
                             when {
-                                checked -> component.favourites.deleteFavourite(fullUrl)
-                                else -> component.favourites.overwriteFavourite(fullUrl, url)
+                                checked -> component.favourites.removeFavourite(url)
+                                else -> component.favourites.overwriteFavourite(url)
                             }
                         }
                     ) {
@@ -93,9 +96,7 @@ internal fun ShortenResponse(
                         )
                     }
                     IconButton(
-                        onClick = {
-                            component.toast("Copied '$url' to clipboard")
-                            clipboardManager.setText(AnnotatedString(url)) },
+                        onClick = { component.favourites.onFavouriteClick(clipboardManager, url) },
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.ContentCopy,
