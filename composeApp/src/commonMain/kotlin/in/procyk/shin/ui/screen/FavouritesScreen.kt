@@ -1,10 +1,7 @@
 package `in`.procyk.shin.ui.screen
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -23,37 +20,46 @@ import `in`.procyk.shin.component.FavouritesComponent
 @Composable
 internal fun FavouritesScreen(component: FavouritesComponent) {
     val favourites by component.favourites.subscribeAsState()
-    LazyColumn {
-        items(favourites, key = { it.shortUrl }) { item ->
-            val clipboardManager = LocalClipboardManager.current
-            Card(
-                shape = MaterialTheme.shapes.small,
-                modifier = Modifier
-                    .padding(top = 16.dp, start = 16.dp, end = 16.dp)
-                    .clickable { component.onFavouriteClick(clipboardManager, item.shortUrl) }
-            ) {
-                Row(
+    if (favourites.isEmpty()) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("No Favourites")
+        }
+    } else {
+        LazyColumn {
+            items(favourites, key = { it.shortUrl }) { item ->
+                val clipboardManager = LocalClipboardManager.current
+                Card(
+                    shape = MaterialTheme.shapes.small,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
+                        .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+                        .clickable { component.onFavouriteClick(clipboardManager, item.shortUrl) }
                 ) {
-                    IconButton(
-                        onClick = { component.removeFavourite(item.shortUrl) }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Icon(Icons.Outlined.Delete, contentDescription = "Delete favourite")
+                        IconButton(
+                            onClick = { component.removeFavourite(item.shortUrl) }
+                        ) {
+                            Icon(Icons.Outlined.Delete, contentDescription = "Delete favourite")
+                        }
+                        Text(
+                            text = item.fullUrl,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Text(
+                            text = item.shortUrl,
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.End
+                        )
                     }
-                    Text(
-                        text = item.fullUrl,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Text(
-                        text = item.shortUrl,
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.End
-                    )
                 }
             }
         }

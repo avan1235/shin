@@ -47,18 +47,18 @@ internal fun ShortenResponse(
         enter = expandVertically(expandFrom = Alignment.Top),
         exit = shrinkVertically(shrinkTowards = Alignment.Top),
     ) {
-        (shortenedUrl.toNullable() ?: lastShortenedUrl)?.let { url ->
+        (shortenedUrl.toNullable() ?: lastShortenedUrl)?.let { shortUrl ->
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp, alignment = Alignment.CenterVertically),
                 modifier = Modifier.padding(vertical = 32.dp)
             ) {
                 QrCode(
-                    url = url,
+                    url = shortUrl,
                     modifier = Modifier.size(256.dp).aspectRatio(1f),
                 )
                 val color = MaterialTheme.colorScheme.primary
-                val annotatedString = remember(url, color) { createUrlAnnotatedString(url, color) }
+                val annotatedString = remember(shortUrl, color) { createUrlAnnotatedString(shortUrl, color) }
                 val clipboardManager = LocalClipboardManager.current
                 val localUriHandler = LocalUriHandler.current
                 val interactionSource = remember { MutableInteractionSource() }
@@ -74,19 +74,19 @@ internal fun ShortenResponse(
                             .getStringAnnotations(UrlTag, position, position)
                             .single()
                             .let {
-                                clipboardManager.setText(AnnotatedString(url))
-                                localUriHandler.openUri(url)
+                                clipboardManager.setText(AnnotatedString(shortUrl))
+                                localUriHandler.openUri(shortUrl)
                             }
                     }
                 )
                 Row {
-                    val checked by component.favourites.isFavourite(url).subscribeAsState()
+                    val checked by component.favourites.isFavourite(shortUrl).subscribeAsState()
                     IconToggleButton(
                         checked = checked,
                         onCheckedChange = {
                             when {
-                                checked -> component.favourites.removeFavourite(url)
-                                else -> component.favourites.overwriteFavourite(url)
+                                checked -> component.favourites.removeFavourite(shortUrl)
+                                else -> component.favourites.overwriteFavourite(shortUrl)
                             }
                         }
                     ) {
@@ -96,7 +96,7 @@ internal fun ShortenResponse(
                         )
                     }
                     IconButton(
-                        onClick = { component.favourites.onFavouriteClick(clipboardManager, url) },
+                        onClick = { component.favourites.onFavouriteClick(clipboardManager, shortUrl) },
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.ContentCopy,
