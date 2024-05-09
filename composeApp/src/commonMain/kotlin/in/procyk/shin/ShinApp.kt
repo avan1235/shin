@@ -4,7 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.QrCodeScanner
@@ -17,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.extensions.compose.stack.animation.slide
@@ -27,6 +29,8 @@ import `in`.procyk.compose.camera.permission.rememberCameraPermissionState
 import `in`.procyk.shin.component.ShinAppComponent
 import `in`.procyk.shin.component.ShinAppComponent.Child
 import `in`.procyk.shin.component.ShinAppComponent.MenuItem
+import `in`.procyk.shin.ui.component.BottomBanner
+import `in`.procyk.shin.ui.component.BottomBannerItem
 import `in`.procyk.shin.ui.component.ShinBanner
 import `in`.procyk.shin.ui.icons.Github
 import `in`.procyk.shin.ui.icons.Html5
@@ -72,10 +76,12 @@ private inline fun NavigationDrawer(
     val activeMenuItem by component.activeMenuItem.subscribeAsState()
     ModalNavigationDrawer(
         modifier = Modifier
-            .onKeyEvent { event ->
-                (drawerState.isOpen && event.isEscDown).also { isConsumed ->
-                    if (isConsumed) scope.launch { drawerState.close() }
+            .onKeyEvent handle@{ event ->
+                when {
+                    drawerState.isOpen && event.isEscDown -> scope.launch { drawerState.close() }
+                    else -> return@handle false
                 }
+                return@handle true
             },
         drawerState = drawerState,
         drawerContent = {
@@ -97,7 +103,10 @@ private inline fun NavigationDrawer(
                 ).forEach { item ->
                     NavigationDrawerItem(
                         icon = {
-                            Icon(item.icon, contentDescription = "Menu item icon")
+                            Icon(
+                                if (item == activeMenuItem) item.filledIcon else item.outlinedIcon,
+                                contentDescription = "Menu item icon"
+                            )
                         },
                         label = {
                             Text(item.presentableName)
@@ -114,23 +123,12 @@ private inline fun NavigationDrawer(
                 Spacer(
                     modifier = Modifier.weight(1f)
                 )
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 12.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text("Find Me On")
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally)
-                    ) {
-                        FindMeOn(ShinIcons.Github, "https://github.com/avan1235/", "Github")
-                        FindMeOn(ShinIcons.LinkedIn, "https://www.linkedin.com/in/maciej-procyk/", "LinkedIn")
-                        FindMeOn(ShinIcons.Html5, "https://procyk.in", "web")
-                    }
-                }
+                BottomBanner(
+                    title = "Find Me On",
+                    BottomBannerItem("https://github.com/avan1235/", ShinIcons.Github),
+                    BottomBannerItem("https://www.linkedin.com/in/maciej-procyk/", ShinIcons.LinkedIn),
+                    BottomBannerItem("https://procyk.in", ShinIcons.Html5),
+                )
             }
         },
     ) {
@@ -180,23 +178,18 @@ private inline fun NavigationDrawer(
     }
 }
 
-@Composable
-private inline fun FindMeOn(
-    icon: ImageVector,
-    url: String,
-    name: String,
-) {
-    val uriHandler = LocalUriHandler.current
-    IconButton(onClick = { uriHandler.openUri(url) }) {
-        Icon(icon, "Find me on $name")
-    }
-}
-
-private inline val MenuItem.icon: ImageVector
+private inline val MenuItem.outlinedIcon: ImageVector
     get() = when (this) {
         MenuItem.Main -> Icons.Outlined.Home
         MenuItem.ScanQRCode -> Icons.Outlined.QrCodeScanner
         MenuItem.Favourites -> Icons.Outlined.Favorite
+    }
+
+private inline val MenuItem.filledIcon: ImageVector
+    get() = when (this) {
+        MenuItem.Main -> Icons.Filled.Home
+        MenuItem.ScanQRCode -> Icons.Filled.QrCodeScanner
+        MenuItem.Favourites -> Icons.Filled.Favorite
     }
 
 private inline val MenuItem.presentableName: String

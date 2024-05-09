@@ -14,8 +14,6 @@ interface ShinAppComponent : Component {
 
     val activeMenuItem: Value<MenuItem>
 
-    fun onBackClicked(toIndex: Int)
-
     fun navigateTo(item: MenuItem)
 
     enum class MenuItem {
@@ -81,11 +79,6 @@ class ShinAppComponentImpl(
                 componentContext = childComponentContext
             )
         )
-    }
-
-
-    override fun onBackClicked(toIndex: Int) {
-        navigation.popTo(index = toIndex)
     }
 
     override fun navigateTo(item: MenuItem) {

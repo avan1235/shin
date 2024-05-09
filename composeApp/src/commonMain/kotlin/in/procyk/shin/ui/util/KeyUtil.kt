@@ -3,4 +3,7 @@ package `in`.procyk.shin.ui.util
 import androidx.compose.ui.input.key.*
 
 internal val KeyEvent.isEscDown: Boolean
-    get() = key == Key.Escape && type == KeyEventType.KeyDown
+    get() = this.key == Key.Escape && this.type == KeyEventType.KeyDown
+
+internal fun KeyEvent.isKeyDown(key: Key): Boolean =
+    this.key == key && this.type == KeyEventType.KeyDown

@@ -13,6 +13,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
 import shin.composeapp.generated.resources.Mansalva_Regular
+import shin.composeapp.generated.resources.PoetsenOne_Regular
 import shin.composeapp.generated.resources.Res
 
 @Composable
@@ -33,6 +34,8 @@ internal fun ShinBanner(
         )
         Text(
             text = "Shorten Your URL with Kotlin",
+            fontFamily = FontFamily(Font(Res.font.PoetsenOne_Regular)),
+            style = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth(),
         )
