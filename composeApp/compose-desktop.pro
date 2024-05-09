@@ -1,4 +1,15 @@
 -keep class io.ktor.client.engine.java.JavaHttpEngineContainer
 -keep class kotlinx.coroutines.swing.SwingDispatcherFactory
--keep class com.arkivanov.decompose.extensions.compose.jetbrains.mainthread.SwingMainThreadChecker
+-keep class com.arkivanov.decompose.extensions.compose.mainthread.SwingMainThreadChecker
+-keep class org.bridj.** { *; }
+-keep class com.sun.jna.** { *; }
+-keep class com.google.zxing.** { *; }
+
 -dontwarn org.slf4j.**
+-dontwarn org.osgi.framework.**
+-dontwarn com.github.sarxos.webcam.log.**
+-dontwarn com.github.eduramiba.webcamcapture.TestDriver
+-dontwarn com.github.eduramiba.webcamcapture.TestDriver$1
+-dontwarn javafx.scene.image.WritableImage
+-dontwarn javafx.scene.image.PixelFormat
+-dontwarn javafx.scene.image.PixelWriter
