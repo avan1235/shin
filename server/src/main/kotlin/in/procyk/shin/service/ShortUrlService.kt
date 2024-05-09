@@ -103,7 +103,7 @@ private fun String.normalizeUrlCase(): String? = try {
 private fun String.sha256(): String = MessageDigest
     .getInstance("SHA-256")
     .digest(toByteArray())
-    .let(Base64.getEncoder()::encodeToString)
+    .let(Base64.getUrlEncoder()::encodeToString)
 
 private data class ShortenedIdentifier(
     val url: String,
