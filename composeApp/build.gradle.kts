@@ -180,11 +180,17 @@ compose {
             windows {
                 menu = false
                 upgradeUuid = "1a273513-558a-4322-9833-ff3a4c3c1173"
+                iconFile.set(projectDir.resolve("src/desktopMain/resources/ic_launcher.ico"))
+            }
+
+            linux {
+                iconFile.set(projectDir.resolve("src/desktopMain/resources/ic_launcher.png"))
             }
 
             macOS {
                 bundleID = "in.procyk.shin"
                 appStore = false
+                iconFile.set(projectDir.resolve("src/desktopMain/resources/ic_launcher.icns"))
                 signing {
                     sign = false
                 }
