@@ -174,7 +174,7 @@ compose {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "shin"
+            packageName = "Shin"
             modules("java.net.http")
 
             windows {
