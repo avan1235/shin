@@ -119,9 +119,19 @@ private fun Settings.saveFavourites(favourites: Map<String, Favourite>) {
 
 private suspend fun HttpClient.requestFullUrl(shortUrl: String): String? {
     val response = get(shortUrl)
-    if (response.status !in REDIRECT_STATUS_CODES) return null
-    
-    return response.call.response.headers[HttpHeaders.Location]
+    if (response.status in REDIRECT_STATUS_CODES) {
+        return response.call.response.headers[HttpHeaders.Location]
+    }
+    val index = shortUrl.indexOf("/#")
+    if (index == -1) return null
+
+    val productionShortUrl = shortUrl.replaceRange(0..index + 1, "https://api-shorten-kotlin.koyeb.app/")
+    val productionResponse = get(productionShortUrl)
+    if (productionResponse.status in REDIRECT_STATUS_CODES) {
+        return productionResponse.call.response.headers[HttpHeaders.Location]
+    }
+
+    return null
 }
 
 private val REDIRECT_STATUS_CODES: Set<HttpStatusCode> = setOf(HttpStatusCode.MovedPermanently, HttpStatusCode.Found)
