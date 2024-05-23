@@ -40,6 +40,7 @@ import `in`.procyk.shin.ui.screen.FavouritesScreen
 import `in`.procyk.shin.ui.screen.MainScreen
 import `in`.procyk.shin.ui.screen.ScanQRCodeScreen
 import `in`.procyk.shin.ui.theme.ShinTheme
+import `in`.procyk.shin.ui.util.applyIf
 import `in`.procyk.shin.ui.util.isEscDown
 import kotlinx.coroutines.launch
 
@@ -134,7 +135,9 @@ private inline fun NavigationDrawer(
     ) {
         Scaffold(
             snackbarHost = { SnackbarHost(component.snackbarHostState) },
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .applyIf(showTopMenu) { windowInsetsPadding(WindowInsets.safeContent) },
         ) {
             if (showTopMenu) {
                 Box(
