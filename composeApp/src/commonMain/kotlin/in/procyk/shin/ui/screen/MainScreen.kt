@@ -9,7 +9,9 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.unit.dp
 import `in`.procyk.shin.component.MainComponent
 import `in`.procyk.shin.shared.applyIf
-import `in`.procyk.shin.ui.component.*
+import `in`.procyk.shin.ui.component.ShinBanner
+import `in`.procyk.shin.ui.component.ShortenRequestItems
+import `in`.procyk.shin.ui.component.ShortenResponse
 import `in`.procyk.shin.ui.util.isEscDown
 
 @Composable

@@ -17,15 +17,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.extensions.compose.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import `in`.procyk.compose.camera.permission.rememberCameraPermissionState
+import `in`.procyk.compose.util.NoSystemBarsScreen
 import `in`.procyk.shin.component.ShinAppComponent
 import `in`.procyk.shin.component.ShinAppComponent.Child
 import `in`.procyk.shin.component.ShinAppComponent.MenuItem
@@ -40,8 +43,10 @@ import `in`.procyk.shin.ui.screen.FavouritesScreen
 import `in`.procyk.shin.ui.screen.MainScreen
 import `in`.procyk.shin.ui.screen.ScanQRCodeScreen
 import `in`.procyk.shin.ui.theme.ShinTheme
+import `in`.procyk.shin.ui.theme.SystemBarsScreen
 import `in`.procyk.shin.ui.util.applyIf
 import `in`.procyk.shin.ui.util.isEscDown
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
@@ -133,50 +138,64 @@ private inline fun NavigationDrawer(
             }
         },
     ) {
-        Scaffold(
-            snackbarHost = { SnackbarHost(component.snackbarHostState) },
-            modifier = Modifier
-                .fillMaxSize()
-                .applyIf(showTopMenu) { windowInsetsPadding(WindowInsets.safeContent) },
-        ) {
-            if (showTopMenu) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 48.dp),
-                    content = content,
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp)
-                        .background(MaterialTheme.colorScheme.primaryContainer)
-                ) {
-                    IconButton(
-                        modifier = Modifier.align(Alignment.CenterStart),
-                        onClick = {
-                            scope.launch {
-                                drawerState.run {
-                                    if (isClosed) {
-                                        keyboardController?.hide()
-                                        open()
-                                    } else {
-                                        close()
-                                    }
+        if (showTopMenu) SystemBarsScreen {
+            NavigationDrawerScaffold(component, showTopMenu, drawerState, keyboardController, scope, content)
+        } else NoSystemBarsScreen {
+            NavigationDrawerScaffold(component, showTopMenu, drawerState, keyboardController, scope, content)
+        }
+    }
+}
+
+@Composable
+private inline fun NavigationDrawerScaffold(
+    component: ShinAppComponent,
+    showTopMenu: Boolean,
+    drawerState: DrawerState,
+    keyboardController: SoftwareKeyboardController?,
+    scope: CoroutineScope,
+    crossinline content: @Composable (BoxScope.() -> Unit)
+) {
+    Scaffold(
+        snackbarHost = { SnackbarHost(component.snackbarHostState) },
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        if (showTopMenu) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 48.dp),
+                content = content,
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp)
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+            ) {
+                IconButton(
+                    modifier = Modifier.align(Alignment.CenterStart),
+                    onClick = {
+                        scope.launch {
+                            drawerState.run {
+                                if (isClosed) {
+                                    keyboardController?.hide()
+                                    open()
+                                } else {
+                                    close()
                                 }
                             }
                         }
-                    ) {
-                        Icon(Icons.Default.Menu, contentDescription = "Menu")
                     }
+                ) {
+                    Icon(Icons.Default.Menu, contentDescription = "Menu")
                 }
-            } else {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    content = content,
-                )
             }
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                content = content,
+            )
         }
     }
 }
