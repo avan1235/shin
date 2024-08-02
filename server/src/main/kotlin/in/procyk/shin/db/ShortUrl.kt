@@ -20,6 +20,7 @@ internal object ShortUrls : IdTable<String>() {
         fromDb = { value -> RedirectType.valueOf(value as String) },
         toDb = { PGEnum("redirect_type", it) },
     )
+    val usageCount = long("usage_count").default(0)
 }
 
 internal class ShortUrl(id: EntityID<String>) : Entity<String>(id) {
@@ -28,6 +29,7 @@ internal class ShortUrl(id: EntityID<String>) : Entity<String>(id) {
     var url by ShortUrls.url
     var expirationAt by ShortUrls.expirationAt
     var redirectType by ShortUrls.redirectType
+    var usageCount by ShortUrls.usageCount
 }
 
 val CREATE_REDIRECT_TYPE = """

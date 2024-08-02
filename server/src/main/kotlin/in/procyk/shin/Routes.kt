@@ -65,9 +65,11 @@ private suspend inline fun PipelineContext<Unit, ApplicationCall>.handleDecode(
     service: ShortUrlService,
     decode: Decode,
 ) {
-    val shortened = service.findShortenedUrl(decode.shortenedId)
+    val shortenedId = decode.shortenedId
+    val shortened = service.findShortenedUrl(shortenedId)
     if (shortened != null) {
         call.respondRedirect(shortened.url, permanent = shortened.redirectType.isPermanent)
+        service.increaseShortenedUrlUsageCount(shortenedId)
     } else {
         call.respond(HttpStatusCode.NotFound)
     }

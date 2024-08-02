@@ -22,6 +22,8 @@ internal interface ShortUrlService {
 
     suspend fun findShortenedUrl(shortenedId: String): ShortenedUrl?
 
+    suspend fun increaseShortenedUrlUsageCount(shortenedId: String)
+
     suspend fun deleteExpiredUrls()
 }
 
@@ -42,6 +44,7 @@ private class ShortUrlServiceImpl : ShortUrlService {
                         this.url = shortened.url
                         this.expirationAt = expirationAt
                         this.redirectType = RedirectType.from(shorten.redirectType)
+                        this.usageCount = 0
                     }.let { return@txn shortId }
 
                     shortened.url -> {
@@ -69,6 +72,11 @@ private class ShortUrlServiceImpl : ShortUrlService {
         ShortUrl.findById(shortenedId)
     }?.let {
         ShortenedUrl(it.url, it.redirectType)
+    }
+
+    override suspend fun increaseShortenedUrlUsageCount(shortenedId: String) = newSuspendedTransaction txn@{
+        val shortenedUrl = ShortUrl.findById(shortenedId) ?: return@txn
+        shortenedUrl.usageCount += 1
     }
 
     override suspend fun deleteExpiredUrls() {
