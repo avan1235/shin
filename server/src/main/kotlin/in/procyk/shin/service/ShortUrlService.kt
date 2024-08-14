@@ -1,15 +1,10 @@
 package `in`.procyk.shin.service
 
 import `in`.procyk.shin.db.ShortUrl
-import `in`.procyk.shin.db.ShortUrls
 import `in`.procyk.shin.shared.RedirectType
 import `in`.procyk.shin.shared.Shorten
 import io.ktor.http.*
 import kotlinx.datetime.Clock
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.isNotNull
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.lessEq
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.koin.core.module.Module
 import java.net.URI
@@ -23,8 +18,6 @@ internal interface ShortUrlService {
     suspend fun findShortenedUrl(shortenedId: String): ShortenedUrl?
 
     suspend fun increaseShortenedUrlUsageCount(shortenedId: String)
-
-    suspend fun deleteExpiredUrls()
 }
 
 internal fun Module.singleShortUrlService() {
@@ -34,6 +27,7 @@ internal fun Module.singleShortUrlService() {
 private class ShortUrlServiceImpl : ShortUrlService {
     override suspend fun findOrCreateShortenedId(shorten: Shorten): String? {
         val shortened = shorten.createShortenedIdentifier() ?: return null
+        val oneTimeOnly = shorten.oneTimeOnly
         val expirationAt = shorten.expirationAt
         return newSuspendedTransaction txn@{
             for (count in shortened.takeCounts) {
@@ -43,6 +37,8 @@ private class ShortUrlServiceImpl : ShortUrlService {
                     null -> ShortUrl.new(shortId) {
                         this.url = shortened.url
                         this.expirationAt = expirationAt
+                        this.oneTimeOnly = oneTimeOnly ?: false
+                        this.active = true
                         this.redirectType = RedirectType.from(shorten.redirectType)
                         this.usageCount = 0
                     }.let { return@txn shortId }
@@ -50,15 +46,22 @@ private class ShortUrlServiceImpl : ShortUrlService {
                     shortened.url -> {
                         val prevExpirationAt = existing.expirationAt
                         when {
-                            prevExpirationAt == null -> return@txn shortId
+                            prevExpirationAt == null -> {}
 
                             expirationAt == null || expirationAt > prevExpirationAt -> {
                                 existing.expirationAt = expirationAt
-                                return@txn shortId
                             }
 
-                            else -> return@txn shortId
+                            else -> {}
                         }
+
+                        existing.active = true
+
+                        val prevOneTimeOnly = existing.oneTimeOnly
+                        if (prevOneTimeOnly && (oneTimeOnly == null || !oneTimeOnly)) {
+                            existing.oneTimeOnly = false
+                        }
+                        return@txn shortId
                     }
 
                     else -> continue
@@ -69,21 +72,23 @@ private class ShortUrlServiceImpl : ShortUrlService {
     }
 
     override suspend fun findShortenedUrl(shortenedId: String): ShortenedUrl? = newSuspendedTransaction {
-        ShortUrl.findById(shortenedId)
+        val shortUrl = ShortUrl.findById(shortenedId)
+        when {
+            shortUrl == null || !shortUrl.active -> null
+            shortUrl.oneTimeOnly -> shortUrl.also { it.active = false }
+            shortUrl.expirationAt.let { exp -> exp != null && exp <= Clock.System.now() } ->
+                null.also { shortUrl.active = false }
+
+            else -> shortUrl
+        }
     }?.let {
         ShortenedUrl(it.url, it.redirectType)
     }
 
     override suspend fun increaseShortenedUrlUsageCount(shortenedId: String) = newSuspendedTransaction txn@{
         val shortenedUrl = ShortUrl.findById(shortenedId) ?: return@txn
+        println("increase for ${shortenedUrl.id}")
         shortenedUrl.usageCount += 1
-    }
-
-    override suspend fun deleteExpiredUrls() {
-        val now = Clock.System.now()
-        newSuspendedTransaction {
-            ShortUrls.deleteWhere { (expirationAt.isNotNull()) and (expirationAt.lessEq(now)) }
-        }
     }
 }
 

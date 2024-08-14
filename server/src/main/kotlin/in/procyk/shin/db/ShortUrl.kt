@@ -14,6 +14,8 @@ internal object ShortUrls : IdTable<String>() {
 
     val url = text("url")
     val expirationAt = timestamp("expiration_at").nullable()
+    val oneTimeOnly = bool("one_time_only").default(false)
+    val active = bool("active").default(true)
     val redirectType = customEnumeration(
         name = "redirect_type",
         sql = "redirect_type",
@@ -28,6 +30,8 @@ internal class ShortUrl(id: EntityID<String>) : Entity<String>(id) {
 
     var url by ShortUrls.url
     var expirationAt by ShortUrls.expirationAt
+    var oneTimeOnly by ShortUrls.oneTimeOnly
+    var active by ShortUrls.active
     var redirectType by ShortUrls.redirectType
     var usageCount by ShortUrls.usageCount
 }

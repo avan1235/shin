@@ -24,27 +24,12 @@ internal fun Application.installRoutes(): Routing = routing {
     val service by inject<ShortUrlService>()
     val dotenv by inject<Dotenv>()
     val redirectBaseUrl = dotenv.env<String>("REDIRECT_BASE_URL")
-    GlobalScope.launch {
-        deleteExpiredUrlsEvery(1.hours, service)
-    }
     postBody(ShortenPath) {
         val shorten = call.receive<Shorten>()
         handleShorten(service, redirectBaseUrl, shorten)
     }
     getResource<Decode> {
         handleDecode(service, it)
-    }
-}
-
-private suspend inline fun deleteExpiredUrlsEvery(
-    duration: Duration,
-    service: ShortUrlService,
-) {
-    coroutineScope {
-        while (isActive) {
-            service.deleteExpiredUrls()
-            delay(duration)
-        }
     }
 }
 

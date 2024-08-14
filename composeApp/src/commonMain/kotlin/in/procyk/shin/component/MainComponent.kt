@@ -3,16 +3,17 @@ package `in`.procyk.shin.component
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.childContext
 import com.arkivanov.decompose.value.Value
-import `in`.procyk.shin.ui.util.createHttpClient
 import `in`.procyk.shin.model.ShortenedProtocol
 import `in`.procyk.shin.shared.*
 import `in`.procyk.shin.shared.Option.None
 import `in`.procyk.shin.shared.Option.Some
+import `in`.procyk.shin.ui.util.createHttpClient
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.*
@@ -29,6 +30,8 @@ interface MainComponent : Component {
     val customPrefix: Value<String>
 
     val customPrefixVisible: Value<Boolean>
+
+    val oneTimeOnly: Value<Boolean>
 
     val expirationDate: Value<LocalDate>
 
@@ -49,6 +52,8 @@ interface MainComponent : Component {
     fun onCustomPrefixChange(customPrefix: String)
 
     fun onCustomPrefixVisibleChange(visible: Boolean)
+
+    fun onOneTimeOnlyChange(oneTimeOnly: Boolean)
 
     fun onExpirationDateChange(expirationDate: LocalDate?): Boolean
 
@@ -77,7 +82,8 @@ class MainComponentImpl(
 
     private val httpClient: HttpClient = createHttpClient()
 
-    override val favourites: FavouritesComponent = FavouritesComponentImpl(appContext, componentContext.childContext(key = "Favourites"))
+    override val favourites: FavouritesComponent =
+        FavouritesComponentImpl(appContext, componentContext.childContext(key = "Favourites"))
 
     private val _extraElementsVisible = MutableStateFlow(false)
     override val extraElementsVisible: Value<Boolean> = _extraElementsVisible.asValue()
@@ -87,6 +93,9 @@ class MainComponentImpl(
 
     private val _customPrefixVisible = MutableStateFlow(false)
     override val customPrefixVisible: Value<Boolean> = _customPrefixVisible.asValue()
+
+    private val _oneTimeOnly = MutableStateFlow(false)
+    override val oneTimeOnly: Value<Boolean> = _oneTimeOnly.asValue()
 
     private val _expirationDate = MutableStateFlow(tomorrow)
     override val expirationDate: Value<LocalDate> = _expirationDate.asValue()
@@ -119,6 +128,10 @@ class MainComponentImpl(
 
     override fun onCustomPrefixVisibleChange(visible: Boolean) {
         _customPrefixVisible.update { visible }
+    }
+
+    override fun onOneTimeOnlyChange(oneTimeOnly: Boolean) {
+        _oneTimeOnly.update { oneTimeOnly }
     }
 
     override fun onExpirationDateChange(expirationDate: LocalDate?): Boolean = when {
@@ -172,9 +185,10 @@ class MainComponentImpl(
             httpClient.requestShortenedUrl(
                 url = _fullUrl.value,
                 shortenedProtocol = _protocol.value,
-                customPrefix = _customPrefix.value.takeIfExtraElementsVisibleAnd(customPrefixVisible),
-                expirationDate = _expirationDate.value.takeIfExtraElementsVisibleAnd(expirationDateVisible),
-                redirectType = _redirectType.value.takeIfExtraElementsVisibleAnd(redirectTypeVisible),
+                customPrefix = _customPrefix.takeIfExtraElementsVisibleAnd(customPrefixVisible),
+                oneTimeOnly = _oneTimeOnly.takeIfExtraElementsVisible(),
+                expirationDate = _expirationDate.takeIfExtraElementsVisibleAnd(expirationDateVisible),
+                redirectType = _redirectType.takeIfExtraElementsVisibleAnd(redirectTypeVisible),
                 onResponse = { code, response ->
                     when (code) {
                         HttpStatusCode.OK -> {
@@ -193,14 +207,19 @@ class MainComponentImpl(
     }
 
     @Suppress("NOTHING_TO_INLINE")
-    private inline fun <T> T.takeIfExtraElementsVisibleAnd(value: Value<Boolean>): T? =
-        takeIf { _extraElementsVisible.value && value.value }
+    private inline fun <T : Any> StateFlow<T>.takeIfExtraElementsVisibleAnd(value: Value<Boolean>): T? =
+        this.value.takeIf { _extraElementsVisible.value && value.value }
+
+    @Suppress("NOTHING_TO_INLINE")
+    private inline fun <T : Any> StateFlow<T>.takeIfExtraElementsVisible(): T? =
+        this.value.takeIf { _extraElementsVisible.value }
 }
 
 private suspend inline fun HttpClient.requestShortenedUrl(
     url: String,
     shortenedProtocol: ShortenedProtocol,
     customPrefix: String?,
+    oneTimeOnly: Boolean?,
     expirationDate: LocalDate?,
     redirectType: RedirectType?,
     onResponse: (HttpStatusCode, String) -> Unit,
@@ -209,7 +228,7 @@ private suspend inline fun HttpClient.requestShortenedUrl(
     try {
         val expirationAt = expirationDate?.plus(1, DateTimeUnit.DAY)
             ?.atStartOfDayIn(TimeZone.currentSystemDefault())
-        val shorten = Shorten(shortenedProtocol.buildUrl(url), customPrefix, expirationAt, redirectType)
+        val shorten = Shorten(shortenedProtocol.buildUrl(url), customPrefix, oneTimeOnly, expirationAt, redirectType)
         val response = post(ShortenPath) {
             contentType(ContentType.Application.Cbor)
             setBody(ShinCbor.encodeToByteArray(shorten))

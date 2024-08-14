@@ -24,6 +24,7 @@ enum class RedirectType {
 class Shorten(
     val url: String,
     val customPrefix: String? = null,
+    val oneTimeOnly: Boolean? = null,
     val expirationAt: Instant? = null,
     val redirectType: RedirectType? = null,
 )

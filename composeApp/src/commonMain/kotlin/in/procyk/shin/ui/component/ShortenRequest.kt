@@ -146,6 +146,13 @@ private fun ExpandableSettings(
         )
     }
     ExpandableSetting(
+        name = "One-Time Only",
+        visible = component.oneTimeOnly,
+        isVertical = isVertical,
+        fillMaxWidth = true,
+        onVisibleChange = component::onOneTimeOnlyChange,
+    )
+    ExpandableSetting(
         name = "Expiration Date",
         visible = component.expirationDateVisible,
         isVertical = isVertical,
@@ -185,15 +192,13 @@ private inline val RedirectType.presentableName: String
     }
 
 @Composable
-private inline fun ExpandableSetting(
+private fun ExpandableSetting(
     name: String,
     visible: Value<Boolean>,
     isVertical: Boolean,
     fillMaxWidth: Boolean,
-    noinline onVisibleChange: (Boolean) -> Unit,
-    crossinline content:
-    @Composable
-        () -> Unit,
+    onVisibleChange: (Boolean) -> Unit,
+    content: (@Composable () -> Unit)? = null,
 ) {
     Column(
         modifier = when {
@@ -218,13 +223,16 @@ private inline fun ExpandableSetting(
                 onCheckedChange = onVisibleChange,
             )
         }
+        if (content == null) return@Column
+
         val alpha by animateFloatAsState(if (contentVisible) 1f else 0f)
         Box(
             modifier = Modifier
                 .alpha(alpha)
                 .applyIf(fillMaxWidth && isVertical) { fillMaxWidth() }
                 .applyIf(!fillMaxWidth || !isVertical) { sizeIn(maxWidth = 270.dp) }
-                .applyIf(!contentVisible) { height(1.dp) },
+                .applyIf(!contentVisible) { height(0.dp) }
+                .applyIf(contentVisible) { padding(8.dp) },
         ) {
             content()
         }
