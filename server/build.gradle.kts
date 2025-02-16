@@ -33,6 +33,7 @@ dependencies {
     implementation(libs.ktor.server.cio)
     implementation(libs.ktor.server.resources)
     implementation(libs.ktor.server.content.negotiation)
+    implementation(libs.ktor.server.auto.head.response)
     implementation(libs.ktor.serialization.kotlinx.cbor)
 
     implementation(libs.koin.ktor)

@@ -6,6 +6,7 @@ import io.github.cdimascio.dotenv.Dotenv
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.cbor.*
 import io.ktor.server.application.*
+import io.ktor.server.plugins.autohead.AutoHeadResponse
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.resources.*
@@ -16,6 +17,7 @@ internal fun Application.installPlugins(
     dotenv: Dotenv,
     appModule: Module,
 ) {
+    install(AutoHeadResponse)
     install(Resources)
     install(ContentNegotiation) {
         cbor(ShinCbor)

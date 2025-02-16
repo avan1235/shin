@@ -50,6 +50,7 @@ ktor-server-cio = { module = "io.ktor:ktor-server-cio-jvm", version.ref = "ktor-
 ktor-server-tests = { module = "io.ktor:ktor-server-tests-jvm", version.ref = "ktor-server" }
 ktor-server-resources = { module = "io.ktor:ktor-server-resources", version.ref = "ktor-server" }
 ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor-server" }
+ktor-server-auto-head-response = { module = "io.ktor:ktor-server-auto-head-response", version.ref = "ktor-server" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor-client" }
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor-client" }
 ktor-client-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor-client" }
