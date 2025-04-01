@@ -27,6 +27,29 @@
     "allDeclaredConstructors": true
   },
   {
+    "name": "com.impossibl.postgres.protocol.ssl.ConsolePasswordCallbackHandler",
+    "allPublicMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "io.netty.channel.nio.NioEventLoopGroup",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": ["int", "java.util.concurrent.ThreadFactory"]
+      }
+    ]
+  },
+  {
+    "name": "org.jetbrains.exposed.sql.UUIDColumnType",
+    "allPublicMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
     "name": "in.procyk.shin.shared.RedirectType",
     "fields": [
       {

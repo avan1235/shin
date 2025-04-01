@@ -33,7 +33,7 @@ internal fun Application.installRoutes(): Routing = routing {
     }
 }
 
-private suspend inline fun PipelineContext<Unit, ApplicationCall>.handleShorten(
+private suspend inline fun RoutingContext.handleShorten(
     service: ShortUrlService,
     redirectBaseUrl: String,
     shorten: Shorten,
@@ -46,7 +46,7 @@ private suspend inline fun PipelineContext<Unit, ApplicationCall>.handleShorten(
     }
 }
 
-private suspend inline fun PipelineContext<Unit, ApplicationCall>.handleDecode(
+private suspend inline fun RoutingContext.handleDecode(
     service: ShortUrlService,
     decode: Decode,
 ) {

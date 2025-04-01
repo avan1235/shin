@@ -13,3 +13,4 @@
 -dontwarn javafx.scene.image.WritableImage
 -dontwarn javafx.scene.image.PixelFormat
 -dontwarn javafx.scene.image.PixelWriter
+-dontwarn io.ktor.network.sockets.SocketBase$attachFor$1

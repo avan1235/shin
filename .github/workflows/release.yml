@@ -75,7 +75,7 @@ jobs:
           VERSION: ${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}
 
       - name: Upload deb artifact file to workflow run results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: runner.os == 'Linux'
         with:
           name: Shin-${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}.deb
@@ -93,7 +93,7 @@ jobs:
           asset_content_type: application/x-deb
 
       - name: Upload msi installer file to workflow run results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: runner.os == 'Windows'
         with:
           name: Shin-${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}.msi
@@ -111,7 +111,7 @@ jobs:
           asset_content_type: application/x-ms-dos-executable
 
       - name: Upload dmg image file to workflow run results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: runner.os == 'macOS'
         with:
           name: Shin-${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}.dmg
@@ -175,19 +175,19 @@ jobs:
           VERSION: ${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}
 
       - name: Upload debug artifact file to workflow run results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Shin-Debug-${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}.apk
           path: composeApp/build/outputs/apk/debug/composeApp-debug.apk
 
       - name: Upload release artifact file to workflow run results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Shin-Release-${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}.apk
           path: composeApp/build/outputs/apk/release/composeApp-release.apk
 
       - name: Upload release bundle file to workflow run results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Shin-Release-${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}.aab
           path: composeApp/build/outputs/bundle/release/composeApp-release.aab

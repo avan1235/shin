@@ -1,3 +1,5 @@
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.getCurrentOperatingSystem as currentOS
+
 plugins {
     alias(libs.plugins.kotlinJvm)
     alias(libs.plugins.kotlinSerialization)
@@ -45,7 +47,6 @@ dependencies {
     implementation(libs.dotenv)
     implementation(libs.kotlinx.datetime)
 
-    testImplementation(libs.ktor.server.tests)
     testImplementation(libs.kotlin.test.junit)
 }
 
@@ -57,20 +58,39 @@ graalvmNative {
             verbose.set(true)
 
             buildArgs(
-                "--initialize-at-build-time=ch.qos.logback",
-                "--initialize-at-build-time=io.ktor,kotlin",
-                "--initialize-at-build-time=org.slf4j.LoggerFactory",
+                listOf(
+                    "--initialize-at-build-time=ch.qos.logback",
+                    "--initialize-at-build-time=io.ktor",
+                    "--initialize-at-build-time=kotlin",
+                    "--initialize-at-build-time=kotlinx.io",
+                    "--initialize-at-build-time=org.slf4j.LoggerFactory",
+                    "--initialize-at-build-time=org.slf4j.helpers.Reporter",
 
-                "--initialize-at-build-time=kotlinx.serialization.modules.SerializersModuleKt",
-                "--initialize-at-build-time=kotlinx.serialization.cbor.Cbor\$Default",
-                "--initialize-at-build-time=kotlinx.serialization.cbor.Cbor",
-                "--initialize-at-build-time=kotlinx.serialization.cbor.CborImpl",
+                    "--initialize-at-build-time=kotlinx.serialization.modules.SerializersModuleKt",
+                    "--initialize-at-build-time=kotlinx.serialization.cbor.Cbor\$Default",
+                    "--initialize-at-build-time=kotlinx.serialization.cbor.Cbor",
+                    "--initialize-at-build-time=kotlinx.serialization.cbor.CborImpl",
 
-                "-H:+InstallExitHandlers",
-                "-H:+ReportUnsupportedElementsAtRuntime",
-                "-H:+ReportExceptionStackTraces",
-                "-H:+StaticExecutableWithDynamicLibC",
+                    "--initialize-at-build-time=com.impossibl.postgres.jdbc.PGDriver",
+                    "--initialize-at-build-time=com.impossibl.postgres.system.Version",
+                    "--initialize-at-build-time=com.impossibl.postgres.protocol.ssl.ConsolePasswordCallbackHandler",
+                    "--initialize-at-build-time=java.sql.DriverManager",
+
+                    "--initialize-at-run-time=kotlin.uuid.SecureRandomHolder",
+
+                    "-H:+InstallExitHandlers",
+                    "-H:+ReportUnsupportedElementsAtRuntime",
+                    "-H:+ReportExceptionStackTraces",
+
+                    "--verbose"
+                ) + when {
+                    currentOS().isMacOsX -> emptyList()
+                    else -> listOf(
+                        "-H:+StaticExecutableWithDynamicLibC",
+                    )
+                }
             )
+
 
             imageName.set("server")
         }
