@@ -29,7 +29,7 @@ dotenvGradle = "4.0.0"
 buildKonfig = "0.15.1"
 graalVM = "0.10.1"
 # @keep
-versionCode = "15"
+versionCode = "16"
 
 [libraries]
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }
