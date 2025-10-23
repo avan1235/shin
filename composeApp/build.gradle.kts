@@ -1,6 +1,6 @@
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.getCurrentOperatingSystem as currentOS
 import java.lang.System.getenv
@@ -17,10 +17,10 @@ plugins {
 kotlin {
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        moduleName = "composeApp"
+        outputModuleName = "composeApp"
         browser {
             commonWebpackConfig {
-                outputFileName = "composeApp.js"
+                outputModuleName = "composeApp.js"
                 val corsPort = env.CORS_PORT.value.toInt()
                 devServer = devServer?.copy(port = corsPort) ?: KotlinWebpackConfig.DevServer(port = corsPort)
             }
@@ -28,13 +28,7 @@ kotlin {
         binaries.executable()
     }
 
-    androidTarget {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "1.8"
-            }
-        }
-    }
+    androidTarget()
 
     jvm("desktop")
 
@@ -63,11 +57,10 @@ kotlin {
                 optIn("androidx.compose.material3.ExperimentalMaterial3Api")
                 optIn("androidx.compose.ui.ExperimentalComposeUiApi")
                 optIn("com.arkivanov.decompose.ExperimentalDecomposeApi")
-                optIn("kotlinx.cinterop.BetaInteropApi")
-                optIn("kotlinx.cinterop.ExperimentalForeignApi")
                 optIn("kotlinx.coroutines.DelicateCoroutinesApi")
                 optIn("kotlinx.serialization.ExperimentalSerializationApi")
                 optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
+                optIn("kotlin.time.ExperimentalTime")
             }
         }
 
@@ -210,7 +203,6 @@ compose {
             obfuscate = false
         }
     }
-    experimental.web.application {}
 }
 
 buildkonfig {

@@ -1,4 +1,4 @@
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.getCurrentOperatingSystem as currentOS
 
 plugins {
@@ -13,13 +13,7 @@ kotlin {
         browser()
     }
 
-    androidTarget {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "1.8"
-            }
-        }
-    }
+    androidTarget()
 
     if (currentOS().isMacOsX) {
         iosX64()
@@ -33,6 +27,7 @@ kotlin {
         all {
             languageSettings.apply {
                 optIn("kotlinx.serialization.ExperimentalSerializationApi")
+                optIn("kotlin.time.ExperimentalTime")
             }
         }
         commonMain.dependencies {

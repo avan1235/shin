@@ -4,7 +4,9 @@ import `in`.procyk.shin.db.ShortUrl
 import `in`.procyk.shin.shared.RedirectType
 import `in`.procyk.shin.shared.Shorten
 import io.ktor.http.*
-import kotlinx.datetime.Clock
+import kotlinx.datetime.toDeprecatedInstant
+import kotlinx.datetime.toStdlibInstant
+import kotlin.time.Clock
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.koin.core.module.Module
 import java.net.URI
@@ -36,7 +38,7 @@ private class ShortUrlServiceImpl : ShortUrlService {
                 when (existing?.url) {
                     null -> ShortUrl.new(shortId) {
                         this.url = shortened.url
-                        this.expirationAt = expirationAt
+                        this.expirationAt = expirationAt?.toDeprecatedInstant()
                         this.oneTimeOnly = oneTimeOnly ?: false
                         this.active = true
                         this.redirectType = RedirectType.from(shorten.redirectType)
@@ -44,12 +46,12 @@ private class ShortUrlServiceImpl : ShortUrlService {
                     }.let { return@txn shortId }
 
                     shortened.url -> {
-                        val prevExpirationAt = existing.expirationAt
+                        val prevExpirationAt = existing.expirationAt?.toStdlibInstant()
                         when {
                             prevExpirationAt == null -> {}
 
                             expirationAt == null || expirationAt > prevExpirationAt -> {
-                                existing.expirationAt = expirationAt
+                                existing.expirationAt = expirationAt?.toDeprecatedInstant()
                             }
 
                             else -> {}
@@ -76,7 +78,7 @@ private class ShortUrlServiceImpl : ShortUrlService {
         when {
             shortUrl == null || !shortUrl.active -> null
             shortUrl.oneTimeOnly -> shortUrl.also { it.active = false }
-            shortUrl.expirationAt.let { exp -> exp != null && exp <= Clock.System.now() } ->
+            shortUrl.expirationAt.let { exp -> exp != null && exp.toStdlibInstant() <= Clock.System.now() } ->
                 null.also { shortUrl.active = false }
 
             else -> shortUrl

@@ -12,11 +12,7 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.util.pipeline.*
-import kotlinx.coroutines.*
 import org.koin.ktor.ext.inject
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.hours
 import io.ktor.server.resources.get as getResource
 import io.ktor.server.routing.post as postBody
 

@@ -21,6 +21,7 @@ kotlin {
             languageSettings.apply {
                 optIn("kotlinx.coroutines.DelicateCoroutinesApi")
                 optIn("kotlinx.serialization.ExperimentalSerializationApi")
+                optIn("kotlin.time.ExperimentalTime")
             }
         }
     }

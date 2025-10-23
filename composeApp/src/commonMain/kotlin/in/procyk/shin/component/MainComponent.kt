@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.*
-import kotlinx.datetime.Clock.System.now
+import kotlin.time.Clock.System.now
 import kotlinx.serialization.encodeToByteArray
 import toLocalDate
 

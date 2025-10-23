@@ -1,7 +1,8 @@
 package `in`.procyk.shin.shared
 
 import io.ktor.resources.*
-import kotlinx.datetime.Instant
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.Cbor
 
@@ -25,6 +26,7 @@ class Shorten(
     val url: String,
     val customPrefix: String? = null,
     val oneTimeOnly: Boolean? = null,
+    @Serializable(InstantSerializer::class)
     val expirationAt: Instant? = null,
     val redirectType: RedirectType? = null,
 )
