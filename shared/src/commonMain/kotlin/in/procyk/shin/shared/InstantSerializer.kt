@@ -12,7 +12,7 @@ import kotlin.time.Instant
 
 object InstantSerializer : KSerializer<Instant> {
     override val descriptor: SerialDescriptor
-        get() = SerialDescriptor("in.procyk.bring.InstantSerializer", Long.serializer().descriptor)
+        get() = SerialDescriptor("in.procyk.shin.InstantSerializer", Long.serializer().descriptor)
 
     override fun serialize(encoder: Encoder, value: Instant) {
         encoder.encodeLong(value.toEpochMilliseconds())
