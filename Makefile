@@ -15,7 +15,7 @@ server:
 	chmod +X ./gradlew
 
 server-local: .executable
-	./gradlew server:run
+	./gradlew server:runShadow
 
 desktop: .executable
 	./gradlew composeApp:runReleaseDistributable
