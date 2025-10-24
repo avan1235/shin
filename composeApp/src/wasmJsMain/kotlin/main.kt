@@ -6,11 +6,12 @@ import kotlinx.browser.document
 import `in`.procyk.shin.ShinApp
 import `in`.procyk.shin.component.ShinAppComponentContext
 import `in`.procyk.shin.component.ShinAppComponentImpl
+import `in`.procyk.shin.component.shinCodec
 
 fun main() {
     val lifecycle = LifecycleRegistry()
     val component = ShinAppComponentImpl(
-        ShinAppComponentContext(),
+        ShinAppComponentContext(shinCodec()),
         DefaultComponentContext(lifecycle)
     )
     lifecycle.resume()

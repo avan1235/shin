@@ -72,6 +72,8 @@ kotlin {
 
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.ktor.client.android)
+
+            implementation(libs.kstore.file)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -100,14 +102,16 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.coroutines.core)
 
-            implementation(libs.multiplatform.settings)
-            implementation(libs.multiplatform.settings.no.arg)
+            implementation(libs.kstore)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
 
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.ktor.client.java)
+
+            implementation(libs.kstore.file)
+            implementation(libs.appdirs)
         }
         if (currentOS().isMacOsX) {
             iosMain.dependencies {
@@ -116,10 +120,14 @@ kotlin {
                 api(libs.essenty.statekeeper)
 
                 implementation(libs.ktor.client.darwin)
+
+                implementation(libs.kstore.file)
             }
         }
         wasmJsMain.dependencies {
             implementation(libs.ktor.client.js)
+
+            implementation(libs.kstore.storage)
         }
     }
 }
