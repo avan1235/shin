@@ -30,7 +30,7 @@ buildKonfig = "0.15.1"
 appdirs = "1.4.0"
 graalVM = "0.10.1"
 # @keep
-versionCode = "18"
+versionCode = "19"
 
 [libraries]
 appdirs = { module = "net.harawata:appdirs", version.ref = "appdirs" }
