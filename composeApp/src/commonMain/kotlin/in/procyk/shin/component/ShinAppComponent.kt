@@ -1,20 +1,32 @@
 package `in`.procyk.shin.component
 
-import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.router.stack.*
-import com.arkivanov.decompose.value.Value
-import com.arkivanov.decompose.value.operator.map
-import `in`.procyk.shin.component.ShinAppComponent.Child
-import `in`.procyk.shin.component.ShinAppComponent.MenuItem
-import kotlinx.serialization.Serializable
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import io.github.xxfast.kstore.Codec
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 interface ShinAppComponent : Component {
 
-    val stack: Value<ChildStack<*, Child>>
+    val currentScreen: StateFlow<MenuItem>
 
-    val activeMenuItem: Value<MenuItem>
+    val canGoBack: StateFlow<Boolean>
+
+    val mainComponent: MainComponent
+
+    val favouritesComponent: FavouritesComponent
+
+    val scanQRCodeComponent: ScanQRCodeComponent
 
     fun navigateTo(item: MenuItem)
+
+    fun goBack()
 
     enum class MenuItem {
         Main,
@@ -22,82 +34,78 @@ interface ShinAppComponent : Component {
         Favourites,
         ;
     }
-
-    sealed class Child(val showTopMenu: Boolean) {
-        class Main(val component: MainComponent) : Child(showTopMenu = true)
-        class ScanQRCode(val component: ScanQRCodeComponent) : Child(showTopMenu = false)
-        class Favourites(val component: FavouritesComponent) : Child(showTopMenu = true)
-    }
 }
 
-class ShinAppComponentImpl(
-    appContext: ShinAppComponentContext,
-    componentContext: ComponentContext,
-) : AbstractComponent(appContext, componentContext), ShinAppComponent {
-    private val navigation: StackNavigation<Config> = StackNavigation()
+class ShinAppViewModel(
+    codec: Codec<ShinStore>,
+) : ViewModel(), ShinAppComponent {
 
-    override val stack: Value<ChildStack<*, Child>> = childStack(
-        source = navigation,
-        serializer = Config.serializer(),
-        initialConfiguration = Config.Main,
-        handleBackButton = true,
-        childFactory = ::child,
+    private val _appContext = ShinAppComponentContext(codec)
+
+    override val appContext: ShinAppComponentContext = _appContext
+
+    override val snackbarHostState: SnackbarHostState = _appContext.snackbarHostState
+
+    override fun toast(
+        message: String,
+        actionLabel: String?,
+        withDismissAction: Boolean,
+        duration: SnackbarDuration,
+    ) {
+        viewModelScope.launch {
+            _appContext.snackbarHostState.showSnackbar(message, actionLabel, withDismissAction, duration)
+        }
+    }
+
+    private val _currentScreen = MutableStateFlow(ShinAppComponent.MenuItem.Main)
+    override val currentScreen: StateFlow<ShinAppComponent.MenuItem> = _currentScreen
+
+    private val _previousScreen = MutableStateFlow<ShinAppComponent.MenuItem?>(null)
+    override val canGoBack: StateFlow<Boolean> = _previousScreen
+        .map { it != null }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+    override val mainComponent: MainComponent = MainComponentImpl(
+        appContext = _appContext,
+        scope = viewModelScope,
+        navigateOnScanQRCode = { navigateTo(ShinAppComponent.MenuItem.ScanQRCode) },
     )
 
-    override val activeMenuItem: Value<MenuItem> = stack.map {
-        when (it.active.instance) {
-            is Child.Favourites -> MenuItem.Favourites
-            is Child.Main -> MenuItem.Main
-            is Child.ScanQRCode -> MenuItem.ScanQRCode
-        }
-    }
+    override val favouritesComponent: FavouritesComponent = FavouritesComponentImpl(
+        appContext = _appContext,
+        scope = viewModelScope,
+    )
 
-    private fun child(config: Config, childComponentContext: ComponentContext): Child = when (config) {
-        is Config.Main -> Child.Main(
-            MainComponentImpl(
-                appContext = appContext,
-                componentContext = childComponentContext,
-                navigateOnScanQRCode = { navigateTo(MenuItem.ScanQRCode) },
-            )
-        )
+    override val scanQRCodeComponent: ScanQRCodeComponent = ScanQRCodeComponentImpl(
+        appContext = _appContext,
+        scope = viewModelScope,
+        navigateOnCancel = { scanned ->
+            goBack()
+            scanned?.let { (mainComponent as MainComponentImpl).onUrlChange(it) }
+        },
+    )
 
-        is Config.ScanQRCode -> Child.ScanQRCode(
-            ScanQRCodeComponentImpl(
-                appContext = appContext,
-                componentContext = childComponentContext,
-                navigateOnCancel = { scanned ->
-                    navigation.pop {
-                        scanned?.let { (stack.active.instance as? Child.Main)?.component?.onUrlChange(it) }
-                    }
-                },
-            )
-        )
-
-        is Config.Favourites -> Child.Favourites(
-            FavouritesComponentImpl(
-                appContext = appContext,
-                componentContext = childComponentContext
-            )
-        )
-    }
-
-    override fun navigateTo(item: MenuItem) {
+    override fun navigateTo(item: ShinAppComponent.MenuItem) {
         when (item) {
-            MenuItem.Main -> navigation.popTo(index = 0)
-            MenuItem.ScanQRCode -> Config.ScanQRCode.let(navigation::pushToFront)
-            MenuItem.Favourites -> Config.Favourites.let(navigation::pushToFront)
+            ShinAppComponent.MenuItem.Main -> {
+                _currentScreen.value = ShinAppComponent.MenuItem.Main
+                _previousScreen.value = null
+            }
+            ShinAppComponent.MenuItem.ScanQRCode -> {
+                _previousScreen.value = _currentScreen.value
+                _currentScreen.value = ShinAppComponent.MenuItem.ScanQRCode
+            }
+            ShinAppComponent.MenuItem.Favourites -> {
+                _currentScreen.value = ShinAppComponent.MenuItem.Favourites
+                _previousScreen.value = null
+            }
         }
     }
 
-    @Serializable
-    private sealed interface Config {
-        @Serializable
-        data object Main : Config
-
-        @Serializable
-        data object ScanQRCode : Config
-
-        @Serializable
-        data object Favourites : Config
+    override fun goBack() {
+        _previousScreen.value?.let { prev ->
+            _currentScreen.value = prev
+            _previousScreen.value = null
+        }
     }
 }

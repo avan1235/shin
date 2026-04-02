@@ -21,13 +21,13 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.arkivanov.decompose.extensions.compose.subscribeAsState
+import androidx.compose.runtime.collectAsState
 import `in`.procyk.shin.component.FavouritesComponent
 import `in`.procyk.shin.ui.component.ShinIconButton
 
 @Composable
 internal fun FavouritesScreen(component: FavouritesComponent) {
-    val favourites by component.favourites.subscribeAsState()
+    val favourites by component.favourites.collectAsState()
     if (favourites.isEmpty()) {
         Box(
             modifier = Modifier.fillMaxSize(),

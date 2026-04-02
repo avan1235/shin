@@ -1,30 +1,30 @@
 [versions]
-agp = "8.11.2"
+agp = "9.0.1"
 # @keep
 android-compileSdk = "36"
 # @keep
 android-minSdk = "26"
 # @keep
 android-targetSdk = "36"
-androidx-activityCompose = "1.11.0"
+androidx-activity = "1.13.0"
+androidx-lifecycle = "2.10.0"
 detekt = "1.23.6"
-jetbrains-compose = "1.9.1"
+composeMultiplatform = "1.10.3"
 exposed = "0.60.0"
 # @pin
-kotlin = "2.2.20"
-ktor = "3.1.1"
+kotlin = "2.3.20"
+ktor = "3.4.2"
 koin = "4.1.0-Beta6"
 kotlinxDatetime = "0.7.1-0.6.x-compat"
 kotlinxCoroutines = "1.10.2"
 kotlinxSerialization = "1.9.0"
+material3 = "1.10.0-alpha05"
 qrose = "1.0.1"
 procyk-compose = "1.9.1.0"
 kstore = "1.0.0"
-logback = "1.5.18"
+logback = "1.5.32"
 postgres = "42.7.3"
 dotenv = "6.4.1"
-decompose = "3.4.0"
-essenty = "2.5.0"
 dotenvGradle = "4.0.0"
 buildKonfig = "0.15.1"
 appdirs = "1.4.0"
@@ -38,7 +38,9 @@ kstore = { module = "io.github.xxfast:kstore", version.ref = "kstore" }
 kstore-file = { module = "io.github.xxfast:kstore-file", version.ref = "kstore" }
 kstore-storage = { module = "io.github.xxfast:kstore-storage", version.ref = "kstore" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
-androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
+androidx-lifecycle-viewmodelCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
 exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed" }
 exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
@@ -65,6 +67,7 @@ kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutine
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinxCoroutines" }
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinxSerialization" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "material3" }
 alexzhirkevich-qrose = { module = "io.github.alexzhirkevich:qrose", version.ref = "qrose" }
 procyk-compose-calendar = { module = "in.procyk.compose:calendar", version.ref = "procyk-compose" }
 procyk-compose-camera-qr = { module = "in.procyk.compose:camera-qr", version.ref = "procyk-compose" }
@@ -72,17 +75,14 @@ procyk-compose-camera-permission = { module = "in.procyk.compose:camera-permissi
 procyk-compose-util = { module = "in.procyk.compose:util", version.ref = "procyk-compose" }
 postgres = { module = "org.postgresql:postgresql", version.ref = "postgres" }
 dotenv = { module = "io.github.cdimascio:dotenv-kotlin", version.ref = "dotenv" }
-decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
-decompose-extensionsComposeJetbrains = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "decompose" }
-essenty-lifecycle = { module = "com.arkivanov.essenty:lifecycle", version.ref = "essenty" }
-essenty-statekeeper = { module = "com.arkivanov.essenty:state-keeper", version.ref = "essenty" }
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
+androidMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
-jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "jetbrains-compose" }
+composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

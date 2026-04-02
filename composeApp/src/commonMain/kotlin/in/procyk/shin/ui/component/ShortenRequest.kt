@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -30,8 +31,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.arkivanov.decompose.extensions.compose.subscribeAsState
-import com.arkivanov.decompose.value.Value
 import `in`.procyk.compose.calendar.SelectableCalendar
 import `in`.procyk.compose.calendar.rememberSelectableCalendarState
 import `in`.procyk.compose.calendar.year.YearMonth
@@ -39,6 +38,7 @@ import `in`.procyk.shin.component.MainComponent
 import `in`.procyk.shin.model.ShortenedProtocol
 import `in`.procyk.shin.shared.RedirectType
 import `in`.procyk.shin.shared.applyIf
+import kotlinx.coroutines.flow.StateFlow
 
 internal fun LazyListScope.ShortenRequestItems(
     component: MainComponent,
@@ -92,7 +92,7 @@ private fun ShortenRequestExtraElements(
     component: MainComponent,
     isVertical: Boolean,
 ) {
-    val extraElementsVisible by component.extraElementsVisible.subscribeAsState()
+    val extraElementsVisible by component.extraElementsVisible.collectAsState()
     val rotation by animateFloatAsState(if (extraElementsVisible) 180f else 0f)
     OutlinedButton(onClick = component::onExtraElementsVisibleChange) {
         Text("Extra Options")
@@ -137,7 +137,7 @@ private fun ExpandableSettings(
         fillMaxWidth = true,
         onVisibleChange = component::onCustomPrefixVisibleChange,
     ) {
-        val customPrefix by component.customPrefix.subscribeAsState()
+        val customPrefix by component.customPrefix.collectAsState()
         ShinTextField(
             value = customPrefix,
             label = "Prefix",
@@ -159,7 +159,7 @@ private fun ExpandableSettings(
         fillMaxWidth = false,
         onVisibleChange = component::onExpirationDateVisibleChange,
     ) {
-        val expirationDate by component.expirationDate.subscribeAsState()
+        val expirationDate by component.expirationDate.collectAsState()
         val calendarState = rememberSelectableCalendarState(
             initialMonth = YearMonth.now(),
             minMonth = YearMonth.now(),
@@ -175,7 +175,7 @@ private fun ExpandableSettings(
         fillMaxWidth = true,
         onVisibleChange = component::onRedirectTypeVisibleChange,
     ) {
-        val redirectType by component.redirectType.subscribeAsState()
+        val redirectType by component.redirectType.collectAsState()
         EnumChooser(
             entries = RedirectType.entries,
             value = redirectType,
@@ -194,7 +194,7 @@ private inline val RedirectType.presentableName: String
 @Composable
 private fun ExpandableSetting(
     name: String,
-    visible: Value<Boolean>,
+    visible: StateFlow<Boolean>,
     isVertical: Boolean,
     fillMaxWidth: Boolean,
     onVisibleChange: (Boolean) -> Unit,
@@ -208,7 +208,7 @@ private fun ExpandableSetting(
         verticalArrangement = Arrangement.spacedBy(4.dp, alignment = Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        val contentVisible by visible.subscribeAsState()
+        val contentVisible by visible.collectAsState()
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = when {
@@ -246,8 +246,8 @@ private fun ShortenRequestElements(
     isCameraAvailable: Boolean,
     maxTextFieldWidth: Dp,
 ) {
-    val url by component.fullUrl.subscribeAsState()
-    val protocol by component.protocol.subscribeAsState()
+    val url by component.fullUrl.collectAsState()
+    val protocol by component.protocol.collectAsState()
 
     EnumChooser(
         entries = ShortenedProtocol.entries,

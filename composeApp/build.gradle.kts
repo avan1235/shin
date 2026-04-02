@@ -9,7 +9,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.androidApplication)
-    alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.buildKonfig)
 }
@@ -39,10 +39,6 @@ kotlin {
             iosSimulatorArm64()
         ).forEach { iosTarget ->
             iosTarget.binaries.framework {
-                export(libs.decompose)
-                export(libs.essenty.lifecycle)
-                export(libs.essenty.statekeeper)
-
                 baseName = "ComposeApp"
                 isStatic = true
             }
@@ -56,7 +52,6 @@ kotlin {
             languageSettings.apply {
                 optIn("androidx.compose.material3.ExperimentalMaterial3Api")
                 optIn("androidx.compose.ui.ExperimentalComposeUiApi")
-                optIn("com.arkivanov.decompose.ExperimentalDecomposeApi")
                 optIn("kotlinx.coroutines.DelicateCoroutinesApi")
                 optIn("kotlinx.serialization.ExperimentalSerializationApi")
                 optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
@@ -94,8 +89,8 @@ kotlin {
             implementation(libs.procyk.compose.camera.permission)
             implementation(libs.procyk.compose.util)
 
-            implementation(libs.decompose)
-            implementation(libs.decompose.extensionsComposeJetbrains)
+            implementation(libs.androidx.lifecycle.viewmodelCompose)
+            implementation(libs.androidx.lifecycle.runtimeCompose)
 
             implementation(libs.kotlinx.datetime)
             implementation(libs.kotlinx.serialization.core)
@@ -115,12 +110,7 @@ kotlin {
         }
         if (currentOS().isMacOsX) {
             iosMain.dependencies {
-                api(libs.decompose)
-                api(libs.essenty.lifecycle)
-                api(libs.essenty.statekeeper)
-
                 implementation(libs.ktor.client.darwin)
-
                 implementation(libs.kstore.file)
             }
         }

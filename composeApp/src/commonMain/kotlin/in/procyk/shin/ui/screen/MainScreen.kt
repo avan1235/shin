@@ -7,6 +7,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.unit.dp
+import `in`.procyk.shin.component.FavouritesComponent
 import `in`.procyk.shin.component.MainComponent
 import `in`.procyk.shin.shared.applyIf
 import `in`.procyk.shin.ui.component.ShinBanner
@@ -17,6 +18,7 @@ import `in`.procyk.shin.ui.util.isEscDown
 @Composable
 internal fun MainScreen(
     component: MainComponent,
+    favouritesComponent: FavouritesComponent,
     isCameraAvailable: Boolean,
 ) {
     BoxWithConstraints(
@@ -40,7 +42,7 @@ internal fun MainScreen(
                 ShinBanner()
             }
             item {
-                ShortenResponse(component)
+                ShortenResponse(component, favouritesComponent)
             }
             ShortenRequestItems(
                 component = component,

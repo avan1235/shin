@@ -2,19 +2,12 @@ package `in`.procyk.shin.component
 
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
-import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.value.Value
-import com.arkivanov.essenty.lifecycle.Lifecycle
-import `in`.procyk.shin.ui.util.coroutineScope
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
-import `in`.procyk.shin.ui.util.asValue as asValueUtil
 import kotlinx.coroutines.flow.combine as coroutinesFlowCombine
 import kotlinx.coroutines.flow.map as coroutinesFlowMap
 
@@ -33,10 +26,8 @@ interface Component {
 
 abstract class AbstractComponent(
     final override val appContext: ShinAppComponentContext,
-    componentContext: ComponentContext,
-) : ComponentContext by componentContext, Component {
-
-    protected val scope: CoroutineScope = coroutineScope()
+    protected val scope: CoroutineScope,
+) : Component {
 
     override val snackbarHostState: SnackbarHostState
         get() = appContext.snackbarHostState
@@ -104,15 +95,4 @@ abstract class AbstractComponent(
                 SharingStarted.Eagerly,
                 transform(flow1.value, flow2.value, flow3.value, flow4.value)
             )
-
-    protected fun <T : Any> StateFlow<T>.asValue(
-        lifecycle: Lifecycle = this@AbstractComponent.lifecycle,
-        context: CoroutineContext = Dispatchers.Main.immediate,
-    ): Value<T> = asValueUtil(lifecycle, context)
-
-    protected fun <T : Any> Flow<T>.asValue(
-        initialValue: T,
-        lifecycle: Lifecycle = this@AbstractComponent.lifecycle,
-        context: CoroutineContext = Dispatchers.Main.immediate,
-    ): Value<T> = asValueUtil(initialValue, lifecycle, context)
 }

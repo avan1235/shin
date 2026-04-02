@@ -1,7 +1,10 @@
 package `in`.procyk.shin
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -13,6 +16,7 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.QrCodeScanner
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -23,15 +27,13 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.unit.dp
-import com.arkivanov.decompose.extensions.compose.stack.Children
-import com.arkivanov.decompose.extensions.compose.stack.animation.slide
-import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
-import com.arkivanov.decompose.extensions.compose.subscribeAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
 import `in`.procyk.compose.camera.permission.rememberCameraPermissionState
 import `in`.procyk.compose.util.NoSystemBarsScreen
 import `in`.procyk.shin.component.ShinAppComponent
-import `in`.procyk.shin.component.ShinAppComponent.Child
-import `in`.procyk.shin.component.ShinAppComponent.MenuItem
+import `in`.procyk.shin.component.ShinAppComponentContext
+import `in`.procyk.shin.component.ShinAppViewModel
+import `in`.procyk.shin.component.rememberShinCodec
 import `in`.procyk.shin.ui.component.BottomBanner
 import `in`.procyk.shin.ui.component.BottomBannerItem
 import `in`.procyk.shin.ui.component.ShinBanner
@@ -50,19 +52,27 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun ShinApp(component: ShinAppComponent) {
+fun ShinApp() {
+    val codec = rememberShinCodec()
+    val vm = viewModel { ShinAppViewModel(codec) }
     val permission = rememberCameraPermissionState()
+    val currentScreen by vm.currentScreen.collectAsState()
     ShinTheme {
-        Children(
-            stack = component.stack,
+        AnimatedContent(
+            targetState = currentScreen,
             modifier = Modifier.fillMaxSize(),
-            animation = stackAnimation(slide(orientation = Orientation.Vertical))
-        ) { child ->
-            NavigationDrawer(component, permission.isAvailable, child.instance.showTopMenu) {
-                when (val instance = child.instance) {
-                    is Child.Main -> MainScreen(instance.component, permission.isAvailable)
-                    is Child.ScanQRCode -> ScanQRCodeScreen(instance.component, permission)
-                    is Child.Favourites -> FavouritesScreen(instance.component)
+            transitionSpec = {
+                slideInVertically { it } togetherWith slideOutVertically { -it }
+            },
+        ) { screen ->
+            NavigationDrawer(vm, permission.isAvailable, screen != ShinAppComponent.MenuItem.ScanQRCode) {
+                when (screen) {
+                    ShinAppComponent.MenuItem.Main ->
+                        MainScreen(vm.mainComponent, vm.favouritesComponent, permission.isAvailable)
+                    ShinAppComponent.MenuItem.ScanQRCode ->
+                        ScanQRCodeScreen(vm.scanQRCodeComponent, permission)
+                    ShinAppComponent.MenuItem.Favourites ->
+                        FavouritesScreen(vm.favouritesComponent)
                 }
             }
         }
@@ -79,7 +89,7 @@ private inline fun NavigationDrawer(
     val keyboardController = LocalSoftwareKeyboardController.current
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    val activeMenuItem by component.activeMenuItem.subscribeAsState()
+    val activeMenuItem by component.currentScreen.collectAsState()
     ModalNavigationDrawer(
         modifier = Modifier
             .onKeyEvent handle@{ event ->
@@ -103,9 +113,9 @@ private inline fun NavigationDrawer(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 listOfNotNull(
-                    MenuItem.Main,
-                    MenuItem.ScanQRCode.takeIf { isCameraAvailable },
-                    MenuItem.Favourites,
+                    ShinAppComponent.MenuItem.Main,
+                    ShinAppComponent.MenuItem.ScanQRCode.takeIf { isCameraAvailable },
+                    ShinAppComponent.MenuItem.Favourites,
                 ).forEach { item ->
                     NavigationDrawerItem(
                         icon = {
@@ -200,23 +210,23 @@ private inline fun NavigationDrawerScaffold(
     }
 }
 
-private inline val MenuItem.outlinedIcon: ImageVector
+private inline val ShinAppComponent.MenuItem.outlinedIcon: ImageVector
     get() = when (this) {
-        MenuItem.Main -> Icons.Outlined.Home
-        MenuItem.ScanQRCode -> Icons.Outlined.QrCodeScanner
-        MenuItem.Favourites -> Icons.Outlined.Favorite
+        ShinAppComponent.MenuItem.Main -> Icons.Outlined.Home
+        ShinAppComponent.MenuItem.ScanQRCode -> Icons.Outlined.QrCodeScanner
+        ShinAppComponent.MenuItem.Favourites -> Icons.Outlined.Favorite
     }
 
-private inline val MenuItem.filledIcon: ImageVector
+private inline val ShinAppComponent.MenuItem.filledIcon: ImageVector
     get() = when (this) {
-        MenuItem.Main -> Icons.Filled.Home
-        MenuItem.ScanQRCode -> Icons.Filled.QrCodeScanner
-        MenuItem.Favourites -> Icons.Filled.Favorite
+        ShinAppComponent.MenuItem.Main -> Icons.Filled.Home
+        ShinAppComponent.MenuItem.ScanQRCode -> Icons.Filled.QrCodeScanner
+        ShinAppComponent.MenuItem.Favourites -> Icons.Filled.Favorite
     }
 
-private inline val MenuItem.presentableName: String
+private inline val ShinAppComponent.MenuItem.presentableName: String
     get() = when (this) {
-        MenuItem.Main -> "Home"
-        MenuItem.ScanQRCode -> "Scan QR Code"
-        MenuItem.Favourites -> "Favourites"
+        ShinAppComponent.MenuItem.Main -> "Home"
+        ShinAppComponent.MenuItem.ScanQRCode -> "Scan QR Code"
+        ShinAppComponent.MenuItem.Favourites -> "Favourites"
     }

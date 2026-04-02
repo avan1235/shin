@@ -1,26 +1,26 @@
 package `in`.procyk.shin.component
 
-import com.arkivanov.decompose.ComponentContext
 import `in`.procyk.compose.camera.permission.CameraPermissionState
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
 
 interface ScanQRCodeComponent : Component {
     fun onRequestCameraPermission(permission: CameraPermissionState)
-    
+
     fun onScanned(text: String)
-    
+
     fun onScanError()
-    
+
     fun onCancel()
 }
 
 class ScanQRCodeComponentImpl(
     appContext: ShinAppComponentContext,
-    componentContext: ComponentContext,
+    scope: CoroutineScope,
     private val navigateOnCancel: (scanned: String?) -> Unit,
-) : AbstractComponent(appContext, componentContext), ScanQRCodeComponent {
+) : AbstractComponent(appContext, scope), ScanQRCodeComponent {
 
     private val requestedCameraPermissionCount = MutableStateFlow(0)
 
@@ -31,7 +31,7 @@ class ScanQRCodeComponentImpl(
         }
         permission.launchRequest()
     }
-    
+
     override fun onScanned(text: String) {
         navigateOnCancel(text)
     }

@@ -1,8 +1,5 @@
 package `in`.procyk.shin.component
 
-import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.childContext
-import com.arkivanov.decompose.value.Value
 import `in`.procyk.shin.model.ShortenedProtocol
 import `in`.procyk.shin.shared.*
 import `in`.procyk.shin.shared.Option.None
@@ -12,6 +9,7 @@ import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -23,29 +21,27 @@ import toLocalDate
 
 interface MainComponent : Component {
 
-    val favourites: FavouritesComponent
+    val extraElementsVisible: StateFlow<Boolean>
 
-    val extraElementsVisible: Value<Boolean>
+    val customPrefix: StateFlow<String>
 
-    val customPrefix: Value<String>
+    val customPrefixVisible: StateFlow<Boolean>
 
-    val customPrefixVisible: Value<Boolean>
+    val oneTimeOnly: StateFlow<Boolean>
 
-    val oneTimeOnly: Value<Boolean>
+    val expirationDate: StateFlow<LocalDate>
 
-    val expirationDate: Value<LocalDate>
+    val expirationDateVisible: StateFlow<Boolean>
 
-    val expirationDateVisible: Value<Boolean>
+    val redirectType: StateFlow<RedirectType>
 
-    val redirectType: Value<RedirectType>
+    val redirectTypeVisible: StateFlow<Boolean>
 
-    val redirectTypeVisible: Value<Boolean>
+    val fullUrl: StateFlow<String>
 
-    val fullUrl: Value<String>
+    val shortenedUrl: StateFlow<Option<String>>
 
-    val shortenedUrl: Value<Option<String>>
-
-    val protocol: Value<ShortenedProtocol>
+    val protocol: StateFlow<ShortenedProtocol>
 
     fun onExtraElementsVisibleChange()
 
@@ -76,104 +72,90 @@ interface MainComponent : Component {
 
 class MainComponentImpl(
     appContext: ShinAppComponentContext,
-    componentContext: ComponentContext,
+    scope: CoroutineScope,
     private val navigateOnScanQRCode: () -> Unit,
-) : AbstractComponent(appContext, componentContext), MainComponent {
+) : AbstractComponent(appContext, scope), MainComponent {
 
     private val httpClient: HttpClient = createHttpClient()
 
-    override val favourites: FavouritesComponent =
-        FavouritesComponentImpl(appContext, componentContext.childContext(key = "Favourites"))
+    override val extraElementsVisible: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
-    private val _extraElementsVisible = MutableStateFlow(false)
-    override val extraElementsVisible: Value<Boolean> = _extraElementsVisible.asValue()
+    override val customPrefix: MutableStateFlow<String> = MutableStateFlow("")
 
-    private val _customPrefix = MutableStateFlow("")
-    override val customPrefix: Value<String> = _customPrefix.asValue()
+    override val customPrefixVisible: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
-    private val _customPrefixVisible = MutableStateFlow(false)
-    override val customPrefixVisible: Value<Boolean> = _customPrefixVisible.asValue()
+    override val oneTimeOnly: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
-    private val _oneTimeOnly = MutableStateFlow(false)
-    override val oneTimeOnly: Value<Boolean> = _oneTimeOnly.asValue()
+    override val expirationDate: MutableStateFlow<LocalDate> = MutableStateFlow(tomorrow)
 
-    private val _expirationDate = MutableStateFlow(tomorrow)
-    override val expirationDate: Value<LocalDate> = _expirationDate.asValue()
+    override val expirationDateVisible: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
-    private val _expirationDateVisible = MutableStateFlow(false)
-    override val expirationDateVisible: Value<Boolean> = _expirationDateVisible.asValue()
+    override val redirectType: MutableStateFlow<RedirectType> = MutableStateFlow(RedirectType.Default)
 
-    private val _redirectType = MutableStateFlow(RedirectType.Default)
-    override val redirectType: Value<RedirectType> = _redirectType.asValue()
+    override val redirectTypeVisible: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
-    private val _redirectTypeVisible = MutableStateFlow(false)
-    override val redirectTypeVisible: Value<Boolean> = _redirectTypeVisible.asValue()
+    override val fullUrl: MutableStateFlow<String> = MutableStateFlow("")
 
-    private val _fullUrl = MutableStateFlow("")
-    override val fullUrl: Value<String> = _fullUrl.asValue()
+    override val shortenedUrl: MutableStateFlow<Option<String>> = MutableStateFlow(None)
 
-    private val _shortenedUrl = MutableStateFlow<Option<String>>(None)
-    override val shortenedUrl: Value<Option<String>> = _shortenedUrl.asValue()
-
-    private val _protocol = MutableStateFlow(ShortenedProtocol.HTTPS)
-    override val protocol: Value<ShortenedProtocol> = _protocol.asValue()
+    override val protocol: MutableStateFlow<ShortenedProtocol> = MutableStateFlow(ShortenedProtocol.HTTPS)
 
     override fun onExtraElementsVisibleChange() {
-        _extraElementsVisible.update { !it }
+        extraElementsVisible.update { !it }
     }
 
     override fun onCustomPrefixChange(customPrefix: String) {
-        _customPrefix.update { customPrefix }
+        this.customPrefix.update { customPrefix }
     }
 
     override fun onCustomPrefixVisibleChange(visible: Boolean) {
-        _customPrefixVisible.update { visible }
+        customPrefixVisible.update { visible }
     }
 
     override fun onOneTimeOnlyChange(oneTimeOnly: Boolean) {
-        _oneTimeOnly.update { oneTimeOnly }
+        this.oneTimeOnly.update { oneTimeOnly }
     }
 
     override fun onExpirationDateChange(expirationDate: LocalDate?): Boolean = when {
         expirationDate == null -> {
             val updatedDate = tomorrow
-            _expirationDate.update { updatedDate }
+            this.expirationDate.update { updatedDate }
             true
         }
 
         expirationDate < now().toLocalDate() -> false
 
         else -> {
-            _expirationDate.update { expirationDate }
+            this.expirationDate.update { expirationDate }
             true
         }
     }
 
     override fun onExpirationDateVisibleChange(visible: Boolean) {
-        _expirationDateVisible.update { visible }
+        expirationDateVisible.update { visible }
     }
 
     override fun onRedirectTypeChange(redirectType: RedirectType) {
-        _redirectType.update { redirectType }
+        this.redirectType.update { redirectType }
     }
 
     override fun onRedirectTypeVisibleChange(visible: Boolean) {
-        _redirectTypeVisible.update { visible }
+        redirectTypeVisible.update { visible }
     }
 
     override fun onUrlChange(url: String) {
         val (updatedUrl, updatedProtocol) = ShortenedProtocol.simplifyInputUrl(url)
-        updatedProtocol?.let { protocol -> _protocol.update { protocol } }
-        _fullUrl.update { updatedUrl }
+        updatedProtocol?.let { p -> protocol.update { p } }
+        fullUrl.update { updatedUrl }
     }
 
     override fun onProtocolChange(protocol: ShortenedProtocol) {
-        _protocol.update { protocol }
+        this.protocol.update { protocol }
     }
 
     override fun onShortenedUrlReset() {
-        _shortenedUrl.update { None }
-        _extraElementsVisible.update { false }
+        shortenedUrl.update { None }
+        extraElementsVisible.update { false }
     }
 
     override fun onScanQRCode() {
@@ -183,17 +165,17 @@ class MainComponentImpl(
     override fun onShorten() {
         scope.launch {
             httpClient.requestShortenedUrl(
-                url = _fullUrl.value,
-                shortenedProtocol = _protocol.value,
-                customPrefix = _customPrefix.takeIfExtraElementsVisibleAnd(customPrefixVisible),
-                oneTimeOnly = _oneTimeOnly.takeIfExtraElementsVisible(),
-                expirationDate = _expirationDate.takeIfExtraElementsVisibleAnd(expirationDateVisible),
-                redirectType = _redirectType.takeIfExtraElementsVisibleAnd(redirectTypeVisible),
+                url = fullUrl.value,
+                shortenedProtocol = protocol.value,
+                customPrefix = customPrefix.takeIfExtraElementsVisibleAnd(customPrefixVisible),
+                oneTimeOnly = oneTimeOnly.takeIfExtraElementsVisible(),
+                expirationDate = expirationDate.takeIfExtraElementsVisibleAnd(expirationDateVisible),
+                redirectType = redirectType.takeIfExtraElementsVisibleAnd(redirectTypeVisible),
                 onResponse = { code, response ->
                     when (code) {
                         HttpStatusCode.OK -> {
                             val some = Some(response)
-                            _shortenedUrl.update { some }
+                            shortenedUrl.update { some }
                         }
 
                         HttpStatusCode.BadRequest -> toast("Invalid URL")
@@ -207,12 +189,12 @@ class MainComponentImpl(
     }
 
     @Suppress("NOTHING_TO_INLINE")
-    private inline fun <T : Any> StateFlow<T>.takeIfExtraElementsVisibleAnd(value: Value<Boolean>): T? =
-        this.value.takeIf { _extraElementsVisible.value && value.value }
+    private inline fun <T : Any> MutableStateFlow<T>.takeIfExtraElementsVisibleAnd(visible: StateFlow<Boolean>): T? =
+        this.value.takeIf { extraElementsVisible.value && visible.value }
 
     @Suppress("NOTHING_TO_INLINE")
-    private inline fun <T : Any> StateFlow<T>.takeIfExtraElementsVisible(): T? =
-        this.value.takeIf { _extraElementsVisible.value }
+    private inline fun <T : Any> MutableStateFlow<T>.takeIfExtraElementsVisible(): T? =
+        this.value.takeIf { extraElementsVisible.value }
 }
 
 private suspend inline fun HttpClient.requestShortenedUrl(

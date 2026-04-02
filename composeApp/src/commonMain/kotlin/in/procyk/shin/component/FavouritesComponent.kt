@@ -2,14 +2,16 @@ package `in`.procyk.shin.component
 
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.text.AnnotatedString
-import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.value.Value
 import `in`.procyk.shin.ui.util.createHttpClient
 import io.github.xxfast.kstore.KStore
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlin.time.Clock
@@ -17,15 +19,13 @@ import kotlin.time.Instant
 
 interface FavouritesComponent : Component {
 
-    val favourites: Value<List<Favourite>>
+    val favourites: StateFlow<List<Favourite>>
 
     fun onFavouriteClick(clipboardManager: ClipboardManager, shortUrl: String)
 
     fun overwriteFavourite(shortUrl: String)
 
     fun removeFavourite(shortUrl: String)
-
-    fun isFavourite(shortUrl: String): Value<Boolean>
 }
 
 @Serializable
@@ -37,17 +37,17 @@ data class Favourite(
 
 class FavouritesComponentImpl(
     appContext: ShinAppComponentContext,
-    componentContext: ComponentContext,
-) : AbstractComponent(appContext, componentContext), FavouritesComponent {
+    scope: CoroutineScope,
+) : AbstractComponent(appContext, scope), FavouritesComponent {
 
     private val httpClient: HttpClient = createHttpClient()
 
     private val store: KStore<ShinStore> = appContext.store
 
-    override val favourites: Value<List<Favourite>> =
+    override val favourites: StateFlow<List<Favourite>> =
         store.updates
             .map { it?.favorites?.values?.toList().orEmpty() }
-            .asValue(initialValue = emptyList())
+            .stateIn(scope, SharingStarted.Eagerly, emptyList())
 
     override fun onFavouriteClick(clipboardManager: ClipboardManager, shortUrl: String) {
         toast("Copied '$shortUrl' to clipboard")
@@ -70,11 +70,6 @@ class FavouritesComponentImpl(
             store.update { it?.copy(favorites = it.favorites - shortUrl) }
         }
     }
-
-    override fun isFavourite(shortUrl: String): Value<Boolean> =
-        store.updates
-            .map { it?.favorites?.containsKey(shortUrl) ?: false }
-            .asValue(initialValue = false)
 
     private inline fun findResolvedUrl(shortUrl: String, crossinline onResolved: (fullUrl: String?) -> Unit) {
         scope.launch {

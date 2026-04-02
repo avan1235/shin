@@ -6,38 +6,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import com.arkivanov.decompose.DefaultComponentContext
-import com.arkivanov.decompose.extensions.compose.lifecycle.LifecycleController
-import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import `in`.procyk.shin.ShinApp
-import `in`.procyk.shin.component.ShinAppComponentContext
-import `in`.procyk.shin.component.ShinAppComponentImpl
-import `in`.procyk.shin.component.shinCodec
-import `in`.procyk.shin.runOnUiThread
 
 fun main() {
-    val lifecycle = LifecycleRegistry()
-    val component = runOnUiThread {
-        ShinAppComponentImpl(
-            ShinAppComponentContext(shinCodec()),
-            DefaultComponentContext(lifecycle)
-        )
-    }
     application {
-        val windowState = rememberWindowState(
-            height = DEFAULT_SIZE.height,
-            width = DEFAULT_SIZE.width
-        )
-
-        LifecycleController(lifecycle, windowState)
-
         Window(
             title = "Shin",
             onCloseRequest = ::exitApplication,
-            state = windowState,
+            state = rememberWindowState(
+                height = DEFAULT_SIZE.height,
+                width = DEFAULT_SIZE.width
+            ),
             icon = BitmapPainter(useResource("ic_launcher.png", ::loadImageBitmap)),
         ) {
-            ShinApp(component)
+            ShinApp()
         }
     }
 }

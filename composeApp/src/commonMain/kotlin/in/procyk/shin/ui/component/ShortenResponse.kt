@@ -27,7 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.arkivanov.decompose.extensions.compose.subscribeAsState
+import `in`.procyk.shin.component.FavouritesComponent
 import `in`.procyk.shin.component.MainComponent
 import `in`.procyk.shin.shared.Option
 import `in`.procyk.shin.shared.toNullable
@@ -35,9 +35,10 @@ import `in`.procyk.shin.shared.toNullable
 @Composable
 internal fun ShortenResponse(
     component: MainComponent,
+    favouritesComponent: FavouritesComponent,
 ) {
-    val fullUrl by component.fullUrl.subscribeAsState()
-    val shortenedUrl by component.shortenedUrl.subscribeAsState()
+    val fullUrl by component.fullUrl.collectAsState()
+    val shortenedUrl by component.shortenedUrl.collectAsState()
     var lastShortenedUrl by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(shortenedUrl) {
         (shortenedUrl as? Option.Some)?.let { lastShortenedUrl = it.value }
@@ -80,13 +81,14 @@ internal fun ShortenResponse(
                     }
                 )
                 Row {
-                    val checked by component.favourites.isFavourite(shortUrl).subscribeAsState()
+                    val favourites by favouritesComponent.favourites.collectAsState()
+                    val checked = favourites.any { it.shortUrl == shortUrl }
                     IconToggleButton(
                         checked = checked,
                         onCheckedChange = {
                             when {
-                                checked -> component.favourites.removeFavourite(shortUrl)
-                                else -> component.favourites.overwriteFavourite(shortUrl)
+                                checked -> favouritesComponent.removeFavourite(shortUrl)
+                                else -> favouritesComponent.overwriteFavourite(shortUrl)
                             }
                         }
                     ) {
@@ -96,7 +98,7 @@ internal fun ShortenResponse(
                         )
                     }
                     IconButton(
-                        onClick = { component.favourites.onFavouriteClick(clipboardManager, shortUrl) },
+                        onClick = { favouritesComponent.onFavouriteClick(clipboardManager, shortUrl) },
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.ContentCopy,

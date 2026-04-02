@@ -1,5 +1,7 @@
 package `in`.procyk.shin.component
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import io.github.xxfast.kstore.Codec
 import io.github.xxfast.kstore.file.FileCodec
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -10,6 +12,9 @@ import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
+
+@Composable
+actual fun rememberShinCodec(): Codec<ShinStore> = remember { shinCodec() }
 
 @OptIn(ExperimentalForeignApi::class, ExperimentalUuidApi::class)
 inline fun <reified T : @Serializable Any> shinCodec(): Codec<T> {
